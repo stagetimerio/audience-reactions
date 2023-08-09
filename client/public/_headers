@@ -1,0 +1,6 @@
+/*
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: same-origin
+  X-Content-Type-Options: nosniff
+  Strict-Transport-Security: max-age=86400; includeSubDomains
+  Feature-Policy : camera 'none'; geolocation 'none'; microphone 'none'

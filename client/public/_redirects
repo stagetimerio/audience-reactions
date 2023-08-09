@@ -1,0 +1,11 @@
+# Gandalf Saxing intruders
+/.env          https://www.youtube.com/watch?v=Sagg08DrO5U
+/info.php      https://www.youtube.com/watch?v=Sagg08DrO5U
+/phpinfo.php   https://www.youtube.com/watch?v=Sagg08DrO5U
+/wp-login.php  https://www.youtube.com/watch?v=Sagg08DrO5U
+/wp-admin      https://www.youtube.com/watch?v=Sagg08DrO5U
+/wp-admin/*    https://www.youtube.com/watch?v=Sagg08DrO5U
+/wp-includes/* https://www.youtube.com/watch?v=Sagg08DrO5U
+
+# Enable SPA / Vue Router
+/*     /index.html     200
