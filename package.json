@@ -11,7 +11,7 @@
   "author": "Lukas Hermann <lukas@stagetimer.io>",
   "main": "client/index.html",
   "scripts": {
-    "version": "node syncVersions.js && git add **/package*"
+    "version": "node syncVersion.js && git add **/package*"
   },
   "devDependencies": {
     "eslint": "^8.46.0",
