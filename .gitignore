@@ -1,0 +1,57 @@
+.DS_Store
+node_modules
+dist
+.docker
+.mongodump
+.secrets
+electron.tmp*
+electron.legacy
+electron.forge
+server.tmp*
+.run
+
+# local env files
+.env.local
+.env.*.local
+.env
+docker-compose.yml
+docker-compose.prod.yml
+docker-compose.local.yml
+
+# Log files
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+server/logs/*
+logs
+*.log
+firebase-debug.log*
+firebase-debug.*.log*
+
+# Editor directories and files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# secrets
+*adminsdk*.json
+
+# Local Netlify folder
+.netlify
+
+# Firebase cache
+.firebase/
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Package direcotory (formely submodules)
+packages/

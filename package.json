@@ -1,0 +1,20 @@
+{
+  "name": "❤️ Audience Reactions | by stagetimer.io",
+  "version": "0.0.0",
+  "description": "Let the audience react to your show. Share a link where they can send emoji-reactions to the big screen.",
+  "main": "client/index.html",
+  "scripts": {
+    "version": "node syncVersions.js && git add **/package*"
+  },
+  "author": "Lukas Hermann <lukas@stagetimer.io>",
+  "license": "NONE",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/stagetimerio/audience-reaction.git"
+  },
+  "devDependencies": {
+    "eslint": "^8.46.0",
+    "eslint-plugin-no-only-tests": "^3.1.0"
+  }
+}
