@@ -56,5 +56,7 @@ watch(
   min-height: 100vh;
   /* mobile viewport bug fix */
   min-height: -webkit-fill-available;
+  /* Avoid iPhone double-tap zoom */
+  touch-action: manipulation;
 }
 </style>
