@@ -1,6 +1,6 @@
 <template>
   <div
-    class="fixed w-screen h-screen"
+    class="fixed size-fix"
     :class="background"
   >
     <SiteHeader class="absolute z-20 left-0 top-0 right-0 h-20" />
@@ -49,3 +49,12 @@ watch(
   (newBg) => setBg(newBg),
 )
 </script>
+
+<style scoped>
+.size-fix {
+  width: 100vw;
+  min-height: 100vh;
+  /* mobile viewport bug fix */
+  min-height: -webkit-fill-available;
+}
+</style>
