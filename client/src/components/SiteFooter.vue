@@ -6,28 +6,37 @@
     </div>
     <button
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
-      @click="emit('update:show-buttons', !props.showButtons)"
+      @click="emit('update:hide-buttons', !props.hideButtons)"
     >
-      <FaIcon :icon="props.showButtons ? faEyeSlash : faEye" />
+      <FaIcon :icon="props.hideButtons ? faEye : faEyeSlash" fixed-width />
       <span class="hidden md:inline ml-2">
-        {{ props.showButtons ? 'Hide' : 'Show' }} Buttons
+        {{ props.hideButtons ? 'Show' : 'Hide' }} Buttons
       </span>
     </button>
     <button
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="changeBackground"
     >
-      <FaIcon :icon="faRotate" />
-      <span class="hidden md:inline ml-2">
-        Background: {{ bgName }}
+      <span class="flex gap-2 items-center">
+        <span
+          class="inline-block rounded-full border border-current h-4 w-4"
+          :class="props.background"
+          :style="props.background === backgrounds.TRANSPARENT ? {
+            'background-image': 'url(/fake-transparent.svg)',
+            'background-size': '6px',
+          } : {}"
+        />
+        <span class="hidden md:inline">
+          Background
+        </span>
       </span>
     </button>
     <button
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="shareLink = !shareLink"
     >
-      <FaIcon :icon="faLink" />
-      <span class="hidden md:inline ml-2">
+      <FaIcon :icon="faLink" fixed-width />
+      <span class="hidden md:inline ml-1">
         Share Link
       </span>
     </button>
@@ -38,8 +47,8 @@
       target="_blank"
       rel="noopener"
     >
-      <span class="hidden lg:inline ml-2">A project</span>
-      by <img class="inline h-6" src="/stagetimer-logo-light.svg" alt="stagetimer logo">
+      <span class="hidden lg:inline mr-2">A project by</span>
+      <img class="inline h-5 md:h-6" src="/stagetimer-logo-light.svg" alt="stagetimer logo">
     </a>
     <transition name="fade">
       <div
@@ -73,25 +82,20 @@
 </template>
 
 <script setup>
-import { faUser, faEye, faEyeSlash, faRotate, faLink } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faEye, faEyeSlash, faLink } from '@fortawesome/free-solid-svg-icons'
 import backgrounds from '../utils/backgrounds.js'
 import copy from 'copy-to-clipboard'
 import { ref, computed } from 'vue'
 
 const emit = defineEmits([
   'update:background',
-  'update:show-buttons',
+  'update:hide-buttons',
 ])
 
 const props = defineProps({
   userCount: { type: Number, default: 0 },
   background: { type: String, default: backgrounds.OCEANIC },
-  showButtons: Boolean,
-})
-
-const bgName = computed(() => {
-  const key = backgrounds.valueToKey(props.background)
-  return key[0] + key.toLowerCase().slice(1)
+  hideButtons: Boolean,
 })
 
 function changeBackground () {

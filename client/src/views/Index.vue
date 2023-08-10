@@ -3,20 +3,27 @@
     class="fixed size-fix"
     :class="background"
   >
-    <SiteHeader class="absolute z-20 left-0 top-0 right-0 h-20" />
+    <SiteHeader
+      class="absolute z-20 left-0 top-0 right-0 h-20"
+      :hide-buttons="hideButtons"
+    />
     <div class="absolute z-10 inset-0">
       <EmojiWall
         class="absolute z-0 inset-0"
         :emotes="emotes.all"
       />
-      <EmojiButtons
-        v-if="showButtons"
+      <transition
+        name="fade"
         class="absolute z-20 inset-x-8 inset-y-20 md:inset-1/4"
-        @trigger-emote="key => emotes.add(key)"
-      />
+      >
+        <EmojiButtons
+          v-if="!hideButtons"
+          @trigger-emote="key => emotes.add(key)"
+        />
+      </transition>
     </div>
     <SiteFooter
-      v-model:show-buttons="showButtons"
+      v-model:hide-buttons="hideButtons"
       v-model:background="background"
       :user-count="metrics.subscribers"
       class="absolute z-20 left-0 bottom-0 right-0 h-12"
@@ -31,22 +38,23 @@ import EmojiWall from '../components/EmojiWall.vue'
 import EmojiButtons from '../components/EmojiButtons.vue'
 import { useEmotes } from '../store/emotes.js'
 import { useMetrics } from '../store/metrics.js'
-import backgrounds from '../utils/backgrounds.js'
-import { getParam, setParam } from '../utils/browserAddressParams.js'
+import { params } from '../utils/browserAddressParams.js'
 import { ref, watch } from 'vue'
-
-const getBg = () => backgrounds.keyToValue(getParam('background')) || backgrounds.OCEANIC
-const setBg = (val) => setParam('background', backgrounds.valueToKey(val))
 
 const emotes = useEmotes()
 const metrics = useMetrics()
 
-const background = ref(getBg())
-const showButtons = ref(true)
+const background = ref(params.background)
+const hideButtons = ref(params.hideButtons)
 
 watch(
   () => background.value,
-  (newBg) => setBg(newBg),
+  (val) => params.background = val,
+)
+
+watch(
+  () => hideButtons.value,
+  (val) => params.hideButtons = val,
 )
 </script>
 

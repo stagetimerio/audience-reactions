@@ -2,9 +2,9 @@
   <div class="flex">
     <TransitionGroup name="emoji">
       <div
-        v-for="emote in emotes"
+        v-for="emote in props.emotes"
         :key="emote.id"
-        class="absolute text-5xl sm:text-6xl 2xl:text-9xl opacity-0"
+        class="absolute text-5xl sm:text-6xl 2xl:text-8xl opacity-0"
         :style="{ left: emote.x + '%' }"
       >
         {{ keyEmojiMap[emote.key] }}
@@ -16,7 +16,7 @@
 <script setup>
 import { keyEmojiMap } from '../store/emotes.js'
 
-defineProps({
+const props = defineProps({
   emotes: { type: Array, default: () => [] },
 })
 </script>

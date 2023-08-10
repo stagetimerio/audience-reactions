@@ -2,10 +2,9 @@
 @import "tailwindcss/components.css";
 @import "tailwindcss/utilities.css";
 
-html,
+/*html,
 body {
-  @apply bg-black;
-}
+}*/
 
 button,
 a {
