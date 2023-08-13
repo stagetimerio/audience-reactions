@@ -12,6 +12,7 @@
     "@fortawesome/fontawesome-svg-core": "^6.4.2",
     "@fortawesome/free-solid-svg-icons": "^6.4.2",
     "@fortawesome/vue-fontawesome": "^3.0.3",
+    "@tailwindcss/typography": "^0.5.9",
     "@vitejs/plugin-vue": "^4.2.3",
     "@vueuse/head": "^1.1.26",
     "ably": "^1.2.42",
