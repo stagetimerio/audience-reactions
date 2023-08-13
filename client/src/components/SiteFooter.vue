@@ -48,13 +48,14 @@
     </button>
     <span class="flex-grow" />
     <a
-      class="rounded bg-black/30 hover:bg-black/60 text-white shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      class="flex items-center gap-1 rounded bg-black/30 hover:bg-black/60 text-white shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       href="https://stagetimer.io"
       target="_blank"
       rel="noopener"
     >
-      <span class="hidden lg:inline mr-2">A project by</span>
-      <img class="inline h-5 md:h-6" src="/stagetimer-logo-light.svg" alt="stagetimer logo">
+      <span class="hidden lg:inline">A project by</span>
+      <img class="inline h-6" src="/stagetimer-logomark-white.svg" alt="stagetimer logo">
+      <strong>stagetimer.io</strong>
     </a>
     <transition name="fade">
       <div
