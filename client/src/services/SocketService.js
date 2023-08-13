@@ -23,13 +23,8 @@ export async function init (space, emoteCallback, metricsCallback) {
       console.log('[SocketService] occupancy', message.data.metrics.subscribers)
       metricsCallback(message.data.metrics)
     }))
-    // promises.push(channel.presence.enter())
     const history = await channel.history({ limit: 10 })
-    history.items.forEach(message => {
-      setTimeout(() => emoteCallback(message), Math.random() * 1000)
-    })
-    // const presenceMessage = await channel.presence.get()
-    // console.log('[SocketService] presence', presenceMessage)
+    history.items.forEach(message => emoteCallback(message))
     await Promise.all(promises)
     console.info('[SocketService] init', client.connection.state, client.connection.id)
   })
@@ -37,7 +32,6 @@ export async function init (space, emoteCallback, metricsCallback) {
 
 export async function deinit () {
   _transaction(async () => {
-    // await channel.presence.leave()
     if (channel) await channel.unsubscribe()
     if (client.connection.state = 'connected') await client.close()
     console.info('[SocketService] deinit', client.connection.state, client.connection.id)

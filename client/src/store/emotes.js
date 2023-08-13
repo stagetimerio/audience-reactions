@@ -43,8 +43,7 @@ export const useEmotes = defineStore('emotes', {
       delete this.emotes[id]
     },
     subscriber (key) {
-      console.log('emotes.subscriber', key)
-      this._add(key)
+      setTimeout(() => this._add(key), Math.random() * 600)
     },
   },
 })
