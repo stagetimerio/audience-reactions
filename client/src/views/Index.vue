@@ -5,7 +5,7 @@
   >
     <SiteHeader
       class="absolute z-20 left-0 top-0 right-0 h-20"
-      :hide-buttons="hideButtons"
+      :hide-buttons="hideButtons || hideUi"
     />
     <div class="absolute z-10 inset-0">
       <EmojiWall
@@ -17,7 +17,7 @@
         class="absolute z-20 inset-x-8 inset-y-20 md:inset-1/4"
       >
         <EmojiButtons
-          v-if="!hideButtons"
+          v-if="!hideButtons && !hideUi"
           @trigger-emote="key => emotes.add(key)"
         />
       </transition>
@@ -26,6 +26,7 @@
       v-model:hide-buttons="hideButtons"
       v-model:background="background"
       :user-count="metrics.subscribers"
+      :hide-ui="hideUi"
       class="absolute z-20 left-0 bottom-0 right-0 h-12"
     />
   </div>
@@ -46,6 +47,7 @@ const metrics = useMetrics()
 
 const background = ref(params.background)
 const hideButtons = ref(params.hideButtons)
+const hideUi = ref(params.hideUi)
 
 watch(
   () => background.value,

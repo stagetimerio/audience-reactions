@@ -5,7 +5,7 @@
         v-if="!props.hideButtons"
         class="text-2xl text-white font-semibold"
       >
-        ❤️ Audience Reactions
+        ❤️ Audience Reacts
       </div>
     </transition>
   </div>

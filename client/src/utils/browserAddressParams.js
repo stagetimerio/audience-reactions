@@ -29,4 +29,7 @@ export const params = {
   set hideButtons (val) {
     setParam('hide-buttons', val)
   },
+  get hideUi () {
+    return getParam('hide-ui')
+  },
 }

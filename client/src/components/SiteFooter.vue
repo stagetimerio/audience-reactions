@@ -1,10 +1,14 @@
 <template>
   <div class="flex items-center gap-2 text-sm px-4">
-    <div class="rounded bg-black/30 text-white font-semibold shadow-lg px-3 h-7 leading-7 whitespace-nowrap">
+    <div
+      v-if="!hideUi"
+      class="rounded bg-black/30 text-white font-semibold shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+    >
       <FaIcon :icon="faUser" />
       <span class="ml-2">{{ props.userCount }}</span>
     </div>
     <button
+      v-if="!hideUi"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="emit('update:hide-buttons', !props.hideButtons)"
     >
@@ -14,6 +18,7 @@
       </span>
     </button>
     <button
+      v-if="!hideUi"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="changeBackground"
     >
@@ -32,6 +37,7 @@
       </span>
     </button>
     <button
+      v-if="!hideUi"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="shareLink = !shareLink"
     >
@@ -96,6 +102,7 @@ const props = defineProps({
   userCount: { type: Number, default: 0 },
   background: { type: String, default: backgrounds.OCEANIC },
   hideButtons: Boolean,
+  hideUi: Boolean,
 })
 
 function changeBackground () {
