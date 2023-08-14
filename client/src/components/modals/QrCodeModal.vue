@@ -32,6 +32,7 @@
 <script setup>
 import Modal from './Modal.vue'
 import QrcodeVue from 'qrcode.vue'
+import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 
 const qrcanvas = ref()

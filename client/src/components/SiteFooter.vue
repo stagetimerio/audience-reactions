@@ -40,10 +40,10 @@
       v-if="!hideUi"
       class="rounded shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       :class="{
-        'bg-white text-black': shareLink,
-        'bg-black/30 hover:bg-white text-white hover:text-black': !shareLink,
+        'bg-white text-black': modalOpen.shareLink,
+        'bg-black/30 hover:bg-white text-white hover:text-black': !modalOpen.shareLink,
       }"
-      @click="shareLink = !shareLink"
+      @click="openShareLink"
     >
       <FaIcon :icon="faLink" fixed-width />
       <span class="hidden md:inline ml-1">
@@ -71,7 +71,7 @@
     </a>
     <transition name="fade">
       <div
-        v-if="shareLink"
+        v-if="modalOpen.shareLink"
         class="absolute left-1/2 bottom-12 max-w-[800px] w-10/12 bg-black/30 rounded shadow-lg p-2 -translate-x-1/2"
       >
         <div class="flex gap-2 font-semibold text-white">
@@ -90,13 +90,13 @@
           </button>
           <button
             class="rounded bg-white text-black w-8 h-8"
-            @click="modalOpen.qrCode = !shareLink.qrCode"
+            @click="modalOpen.qrCode = !modalOpen.qrCode"
           >
             <FaIcon :icon="faQrcode" fixed-width />
           </button>
           <button
             class="rounded bg-white text-black w-8 h-8"
-            @click="shareLink = false"
+            @click="modalOpen.shareLink = false"
           >
             <FaIcon :icon="faTimes" fixed-width />
           </button>
@@ -119,9 +119,10 @@ import QrCodeModal from './modals/QrCodeModal.vue'
 import { faUser, faEye, faEyeSlash, faLink, faQuestion, faQrcode, faTimes } from '@fortawesome/free-solid-svg-icons'
 import backgrounds from '../utils/backgrounds.js'
 import copy from 'copy-to-clipboard'
-import { ref, reactive, computed } from 'vue'
+import { ref, reactive } from 'vue'
 
 const modalOpen = reactive({
+  shareLink: false,
   qrCode: false,
   help: false,
 })
@@ -143,8 +144,13 @@ function changeBackground () {
   emit('update:background', backgrounds.values[i + 1] || backgrounds.values[0])
 }
 
-const shareLink = ref(false)
-const link = computed(() => window.location.href)
+
+const link = ref(window.location.href)
+function openShareLink () {
+  link.value = window.location.href
+  modalOpen.shareLink = !modalOpen.shareLink
+}
+
 const justCopied = ref(false)
 function copyLink () {
   copy(link.value)
