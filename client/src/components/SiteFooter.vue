@@ -2,6 +2,7 @@
   <div class="flex items-center gap-2 text-sm px-4">
     <div
       v-if="!hideUi"
+      title="Participants"
       class="rounded bg-black/30 text-white font-semibold shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
     >
       <FaIcon :icon="faUser" />
@@ -9,6 +10,7 @@
     </div>
     <button
       v-if="!hideUi"
+      title="Hide Buttons"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="emit('update:hide-buttons', !props.hideButtons)"
     >
@@ -19,6 +21,7 @@
     </button>
     <button
       v-if="!hideUi"
+      title="Change Background"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       @click="changeBackground"
     >
@@ -38,6 +41,7 @@
     </button>
     <button
       v-if="!hideUi"
+      title="Shareable Link"
       class="rounded shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       :class="{
         'bg-white text-black': modalOpen.shareLink,
@@ -52,7 +56,7 @@
     </button>
     <button
       v-if="!hideUi"
-      aria-label="Help"
+      title="Help"
       class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg w-7 h-7 leading-7"
       @click="modalOpen.help = !modalOpen.help"
     >
@@ -60,6 +64,7 @@
     </button>
     <span class="flex-grow" />
     <a
+      title="A project by Stagetimer"
       class="flex items-center gap-1 rounded bg-black/30 hover:bg-black/60 text-white shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       href="https://stagetimer.io"
       target="_blank"
@@ -67,7 +72,7 @@
     >
       <span class="hidden lg:inline">A project by</span>
       <img class="inline h-6" src="/stagetimer-logomark-white.svg" alt="stagetimer logo">
-      <strong>stagetimer.io</strong>
+      <strong class="hidden sm:inline">stagetimer.io</strong>
     </a>
     <transition name="fade">
       <div
