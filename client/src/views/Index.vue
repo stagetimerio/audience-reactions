@@ -11,6 +11,7 @@
       <EmojiWall
         class="absolute z-0 inset-0"
         :emotes="emotes.all"
+        :full-opacity="background === backgrounds.GREENSCREEN"
       />
       <transition
         name="fade"
@@ -18,6 +19,7 @@
       >
         <EmojiButtons
           v-if="!hideButtons && !hideUi"
+          :full-opacity="background === backgrounds.GREENSCREEN"
           @trigger-emote="key => emotes.add(key)"
         />
       </transition>
@@ -27,6 +29,7 @@
       v-model:background="background"
       :user-count="metrics.subscribers"
       :hide-ui="hideUi"
+      :full-opacity="background === backgrounds.GREENSCREEN"
       class="absolute z-20 left-0 bottom-0 right-0 h-12"
     />
   </div>
@@ -40,6 +43,7 @@ import EmojiButtons from '../components/EmojiButtons.vue'
 import { useEmotes } from '../store/emotes.js'
 import { useMetrics } from '../store/metrics.js'
 import { params } from '../utils/browserAddressParams.js'
+import backgrounds from '../utils/backgrounds.js'
 import { ref, watch } from 'vue'
 
 const emotes = useEmotes()

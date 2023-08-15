@@ -6,7 +6,11 @@
       <button
         v-for="key in Object.values(emoteKeys)"
         :key="key"
-        class="rounded-lg bg-black/30 hover:bg-white shadow-lg text-5xl"
+        class="rounded-lg hover:bg-white shadow-lg text-5xl"
+        :class="{
+          'bg-black': props.fullOpacity,
+          'bg-black/30': !props.fullOpacity,
+        }"
         @click="emit('trigger-emote', key)"
       >
         {{ keyEmojiMap[key] }}
@@ -35,4 +39,7 @@
 import { emoteKeys, keyEmojiMap } from '../store/emotes.js'
 
 const emit =  defineEmits(['trigger-emote'])
+const props = defineProps({
+  fullOpacity: Boolean,
+})
 </script>

@@ -8,7 +8,7 @@ const Background = {
   LUST: 'bg-gradient-to-r from-rose-700 to-pink-600',
   BLACK: 'bg-black',
   TRANSPARENT: 'bg-transparent',
-  GREENSCREEN: 'bg-[#00b140]',
+  GREENSCREEN: 'bg-[#00f731]',
 }
 
 function keyToValue (key) {

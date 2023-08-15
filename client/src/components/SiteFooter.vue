@@ -3,7 +3,11 @@
     <div
       v-if="!hideUi"
       title="Participants"
-      class="rounded bg-black/30 text-white font-semibold shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      class="rounded text-white font-semibold shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
     >
       <FaIcon :icon="faUser" />
       <span class="ml-2">{{ props.userCount }}</span>
@@ -11,7 +15,11 @@
     <button
       v-if="!hideUi"
       title="Hide Buttons"
-      class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
       @click="emit('update:hide-buttons', !props.hideButtons)"
     >
       <FaIcon :icon="props.hideButtons ? faEye : faEyeSlash" fixed-width />
@@ -22,7 +30,11 @@
     <button
       v-if="!hideUi"
       title="Change Background"
-      class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
       @click="changeBackground"
     >
       <span class="flex gap-2 items-center">
@@ -45,7 +57,9 @@
       class="rounded shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
       :class="{
         'bg-white text-black': modalOpen.shareLink,
-        'bg-black/30 hover:bg-white text-white hover:text-black': !modalOpen.shareLink,
+        'hover:bg-white text-white hover:text-black': !modalOpen.shareLink,
+        'bg-black': !modalOpen.shareLink && props.fullOpacity,
+        'bg-black/30': !modalOpen.shareLink && !props.fullOpacity,
       }"
       @click="openShareLink"
     >
@@ -57,7 +71,11 @@
     <button
       v-if="!hideUi"
       title="Help"
-      class="rounded bg-black/30 hover:bg-white text-white hover:text-black shadow-lg w-7 h-7 leading-7"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg w-7 h-7 leading-7"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
       @click="modalOpen.help = !modalOpen.help"
     >
       <FaIcon :icon="faQuestion" fixed-width />
@@ -65,7 +83,11 @@
     <span class="flex-grow" />
     <a
       title="A project by Stagetimer"
-      class="flex items-center gap-1 rounded bg-black/30 hover:bg-black/60 text-white shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      class="flex items-center gap-1 rounded text-white shadow-lg px-3 h-7 leading-7 whitespace-nowrap"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30 hover:bg-black/60': !props.fullOpacity,
+      }"
       href="https://stagetimer.io"
       target="_blank"
       rel="noopener"
@@ -142,6 +164,7 @@ const props = defineProps({
   background: { type: String, default: backgrounds.OCEANIC },
   hideButtons: Boolean,
   hideUi: Boolean,
+  fullOpacity: Boolean,
 })
 
 function changeBackground () {
