@@ -16,7 +16,7 @@
         {{ keyEmojiMap[key] }}
       </button>
     </div>
-    <div>
+    <!-- <div>
       <a
         class="block mx-auto"
         style="width: 200px;"
@@ -31,7 +31,7 @@
           height="54"
         >
       </a>
-    </div>
+    </div> -->
   </div>
 </template>
 
