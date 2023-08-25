@@ -20,3 +20,44 @@ a {
 .fade-leave-to {
   @apply opacity-0;
 }
+
+/*
+ * This provides a background "shimmer" effect for placeholders.
+ * We use pseudo elements with transform instead of background-position to avoid
+ * repaint and improve performance.
+ */
+
+@keyframes bgAnimated{
+  0%{
+    transform: translateX(-40px);
+  }
+  100%{
+    transform: translateX(0px);
+  }
+}
+
+.bg-animated {
+  position: relative;
+  overflow: hidden;
+  background-color: var(--tw-gradient-from);
+}
+
+.bg-animated > * {
+  position: relative;
+  z-index: 1;
+}
+
+.bg-animated:before {
+  --colorA: var(--tw-gradient-from);
+  --colorB: var(--tw-gradient-to);
+  content: '';
+  position: absolute;
+  display: block;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  right: -40px;
+  background-image: linear-gradient(to top right, var(--tw-gradient-from) 0%, var(--tw-gradient-from) 25%, var(--tw-gradient-to) 25%, var(--tw-gradient-to) 50%, var(--tw-gradient-from) 50%, var(--tw-gradient-from) 75%, var(--tw-gradient-to) 75%, var(--tw-gradient-to) 100%);
+  background-size: 10px 10px;
+  animation: 1.5s linear 0s infinite bgAnimated;
+}
