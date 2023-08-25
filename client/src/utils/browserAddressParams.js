@@ -32,4 +32,7 @@ export const params = {
   get hideUi () {
     return getParam('hide-ui')
   },
+  get stats () {
+    return getParam('stats')
+  },
 }

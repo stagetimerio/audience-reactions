@@ -24,6 +24,7 @@ export const keyEmojiMap = {
 export const useEmotes = defineStore('emotes', {
   state: () => ({
     emotes: {},
+    stats: {},
     increment: 1,
     duration: 5000,
   }),
@@ -36,6 +37,7 @@ export const useEmotes = defineStore('emotes', {
       const emote = createEmote(id, key)
       this.emotes[id] = emote
       setTimeout(() => this.remove(id), this.duration)
+      this.stats[key] = this.stats[key] + 1 || 1
     },
     add (key) {
       publish(key)

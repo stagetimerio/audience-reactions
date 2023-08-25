@@ -32,6 +32,7 @@
         v-model:hide-buttons="hideButtons"
         v-model:background="background"
         v-model:fullscreen="fullscreen"
+        :stats="emotes.stats"
         :user-count="metrics.subscribers"
         :hide-ui="hideUi"
         :full-opacity="background === backgrounds.GREENSCREEN"

@@ -13,7 +13,7 @@
     </p>
     <hr>
 
-    <h3 id="-sharing-the-emoji-fun-with-your-audience">
+    <h3 id="sharing-the-emoji-fun-with-your-audience">
       📲 Sharing the Emoji Fun with Your Audience</h3>
     <figure>
       <img
@@ -33,7 +33,7 @@
     </ol>
     <hr>
 
-    <h3 id="-boosting-stage-confidence">
+    <h3 id="boosting-stage-confidence">
       🎤 Boosting Stage Confidence
     </h3>
 
@@ -55,7 +55,7 @@
     </ol>
     <hr>
 
-    <h3 id="-livestreaming-with-obs-studio">
+    <h3 id="livestreaming-with-obs-studio">
       🎥 Livestreaming with OBS Studio
     </h3>
 
@@ -76,7 +76,7 @@
     </ol>
     <hr>
 
-    <h3 id="-bringing-emojis-to-zoom-calls">
+    <h3 id="bringing-emojis-to-zoom-calls">
       📹 Bringing Emojis to Zoom Calls
     </h3>
     <figure>
@@ -94,6 +94,22 @@
       <li>Just follow the same OBS Studio guide, then hit the &quot;Start Virtual Camera&quot; option in OBS.</li>
       <li>Swap to the virtual camera from OBS in Zoom, and you&#39;re all set!</li>
     </ol>
+    <hr>
+
+    <h3 id="display-stats">
+      📈 Display Stats
+    </h3>
+    <figure>
+      <img
+        src="/assets/emoji-stats.jpg"
+        alt="Emoji Reaction the Stats"
+        class="rounded max-w-xl max-h-[120px] mx-auto"
+      >
+      <figcaption class="text-center">
+        Emoji Reaction the Stats
+      </figcaption>
+    </figure>
+    <p>To reveal the stats, manually add <code>&amp;stats=1</code> to the URL. The stats get reset after each page reload.</p>
     <hr>
 
     <p>

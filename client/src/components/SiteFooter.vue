@@ -81,6 +81,19 @@
       <FaIcon :icon="faBook" fixed-width />
       <span class="hidden md:inline ml-1">Docs</span>
     </button>
+    <button
+      v-if="!hideUi && params.stats"
+      title="Stats"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
+      @click="modalOpen.stats = !modalOpen.stats"
+    >
+      <FaIcon :icon="faChartSimple" fixed-width />
+      <span class="hidden md:inline ml-1">Stats</span>
+    </button>
     <span class="flex-grow" />
     <a
       title="A project by Stagetimer"
@@ -112,7 +125,7 @@
     <transition name="fade">
       <div
         v-if="modalOpen.shareLink"
-        class="absolute left-1/2 bottom-12 max-w-[800px] w-10/12 bg-black/30 rounded shadow-lg p-2 -translate-x-1/2"
+        class="absolute left-1/2 bottom-12 max-w-[800px] w-10/12 bg-black/30 rounded shadow-lg p-2 -translate-x-1/2 backdrop-blur"
       >
         <div class="flex gap-2 font-semibold text-white">
           <input
@@ -150,14 +163,24 @@
     <HelpModal
       v-model:open="modalOpen.help"
     />
+    <transition name="fade">
+      <EmojiStats
+        v-if="modalOpen.stats"
+        class="absolute left-1/2 bottom-12 bg-black/30 rounded shadow-lg p-2 -translate-x-1/2"
+        :stats="stats"
+        @close="modalOpen.stats = false"
+      />
+    </transition>
   </div>
 </template>
 
 <script setup>
 import HelpModal from './modals/HelpModal.vue'
 import QrCodeModal from './modals/QrCodeModal.vue'
-import { faUser, faEye, faEyeSlash, faLink, faBook, faQrcode, faTimes, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons'
+import EmojiStats from './EmojiStats.vue'
+import { faUser, faEye, faEyeSlash, faLink, faBook, faQrcode, faTimes, faExpand, faCompress, faChartSimple } from '@fortawesome/free-solid-svg-icons'
 import backgrounds from '../utils/backgrounds.js'
+import { params } from '../utils/browserAddressParams.js'
 import copy from 'copy-to-clipboard'
 import { ref, reactive } from 'vue'
 
@@ -165,6 +188,7 @@ const modalOpen = reactive({
   shareLink: false,
   qrCode: false,
   help: false,
+  stats: params.stats,
 })
 
 const emit = defineEmits([
@@ -176,6 +200,7 @@ const emit = defineEmits([
 const props = defineProps({
   userCount: { type: Number, default: 0 },
   background: { type: String, default: backgrounds.OCEANIC },
+  stats: { type: Object, default: () => ({}) },
   hideButtons: Boolean,
   hideUi: Boolean,
   fullOpacity: Boolean,
