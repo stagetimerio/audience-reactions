@@ -23,7 +23,8 @@
     "qrcode.vue": "^3.4.1",
     "tailwindcss": "^3.3.3",
     "vite": "^4.4.5",
-    "vue": "^3.3.4"
+    "vue": "^3.3.4",
+    "vue-fullscreen": "^3.1.1"
   },
   "devDependencies": {
     "eslint": "^8.46.0",

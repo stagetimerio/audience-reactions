@@ -7,16 +7,18 @@ export const PARTY = 'party'
 export const LOL = 'lol'
 export const SHOCK = 'shock'
 export const POOP = 'poop'
+export const OHH = 'ohh'
+export const CLAP = 'clap'
 
-export const emoteKeys = { HEART, UP, PARTY, LOL, SHOCK, POOP }
+export const emoteKeys = { HEART, UP, PARTY, LOL, OHH, CLAP }
 
 export const keyEmojiMap = {
   [HEART]: '❤️',
   [UP]: '👍',
   [PARTY]: '🎉',
   [LOL]: '😂',
-  [SHOCK]: '😱',
-  [POOP]: '💩',
+  [OHH]: '😮',
+  [CLAP]: '👏',
 }
 
 export const useEmotes = defineStore('emotes', {

@@ -1,7 +1,7 @@
 <template>
   <Modal
     :open="props.open"
-    title="Audience Reacts: Interactive Emoji Reactions Guide"
+    title="Documentation"
     modal-class="max-w-prose"
     body-class="prose"
     closable

@@ -70,15 +70,16 @@
     </button>
     <button
       v-if="!hideUi"
-      title="Help"
-      class="rounded hover:bg-white text-white hover:text-black shadow-lg w-7 h-7 leading-7"
+      title="Documentation"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg px-3 h-7 leading-7"
       :class="{
         'bg-black': props.fullOpacity,
         'bg-black/30': !props.fullOpacity,
       }"
       @click="modalOpen.help = !modalOpen.help"
     >
-      <FaIcon :icon="faQuestion" fixed-width />
+      <FaIcon :icon="faBook" fixed-width />
+      <span class="hidden md:inline ml-1">Docs</span>
     </button>
     <span class="flex-grow" />
     <a
@@ -96,6 +97,18 @@
       <img class="inline h-6" src="/stagetimer-logomark-white.svg" alt="stagetimer logo">
       <strong class="hidden sm:inline">stagetimer.io</strong>
     </a>
+    <button
+      v-if="!hideUi"
+      title="Toggle Fullscreen"
+      class="rounded hover:bg-white text-white hover:text-black shadow-lg w-7 h-7 leading-7"
+      :class="{
+        'bg-black': props.fullOpacity,
+        'bg-black/30': !props.fullOpacity,
+      }"
+      @click="emit('update:fullscreen', !props.fullscreen)"
+    >
+      <FaIcon :icon="props.fullscreen ? faCompress : faExpand" />
+    </button>
     <transition name="fade">
       <div
         v-if="modalOpen.shareLink"
@@ -143,7 +156,7 @@
 <script setup>
 import HelpModal from './modals/HelpModal.vue'
 import QrCodeModal from './modals/QrCodeModal.vue'
-import { faUser, faEye, faEyeSlash, faLink, faQuestion, faQrcode, faTimes } from '@fortawesome/free-solid-svg-icons'
+import { faUser, faEye, faEyeSlash, faLink, faBook, faQrcode, faTimes, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons'
 import backgrounds from '../utils/backgrounds.js'
 import copy from 'copy-to-clipboard'
 import { ref, reactive } from 'vue'
@@ -157,6 +170,7 @@ const modalOpen = reactive({
 const emit = defineEmits([
   'update:background',
   'update:hide-buttons',
+  'update:fullscreen',
 ])
 
 const props = defineProps({
@@ -165,6 +179,7 @@ const props = defineProps({
   hideButtons: Boolean,
   hideUi: Boolean,
   fullOpacity: Boolean,
+  fullscreen: Boolean,
 })
 
 function changeBackground () {
