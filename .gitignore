@@ -9,6 +9,8 @@ electron.legacy
 electron.forge
 server.tmp*
 .run
+.secrets
+.claude
 
 # local env files
 .env.local
