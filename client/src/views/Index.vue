@@ -1,76 +1,38 @@
 <template>
-  <VueFullscreen
-    v-model="fullscreen"
-    fullscreen-class="fullscreen"
-  >
-    <div
-      class="fixed size-fix"
-      :class="background"
-    >
-      <SiteHeader
-        class="absolute z-20 left-0 top-0 right-0 h-20"
-        :hide-buttons="hideButtons || hideUi"
-      />
-      <div class="absolute z-10 inset-0">
-        <EmojiWall
-          class="absolute z-0 inset-0"
-          :emotes="emotes.all"
-          :full-opacity="background === backgrounds.GREENSCREEN"
-        />
-        <transition
-          name="fade"
-          class="absolute z-20 inset-x-8 inset-y-20 md:inset-1/4"
-        >
-          <EmojiButtons
-            v-if="!hideButtons && !hideUi"
-            :full-opacity="background === backgrounds.GREENSCREEN"
-            @trigger-emote="key => emotes.add(key)"
-          />
-        </transition>
+  <div class="min-h-screen bg-gray-100 flex items-center justify-center">
+    <div class="text-center max-w-md mx-auto p-8">
+      <h1 class="text-4xl font-bold text-gray-800 mb-6">❤️ Audience Reacts</h1>
+      <p class="text-gray-600 mb-8">
+        A real-time emoji reaction system for live events.
+      </p>
+
+      <div class="space-y-4">
+        <div class="bg-white rounded-lg p-6 shadow-md">
+          <h2 class="text-xl font-semibold mb-3">For Event Organizers</h2>
+          <p class="text-gray-600 mb-4">Create rooms and manage audience reactions</p>
+          <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-2 rounded-lg transition-colors">
+            Create Dashboard
+          </button>
+        </div>
+
+        <div class="bg-white rounded-lg p-6 shadow-md">
+          <h2 class="text-xl font-semibold mb-3">For Audience</h2>
+          <p class="text-gray-600 mb-4">Scan QR code or enter room ID to participate</p>
+          <button class="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg transition-colors">
+            Join Room
+          </button>
+        </div>
       </div>
-      <SiteFooter
-        v-model:hide-buttons="hideButtons"
-        v-model:background="background"
-        v-model:fullscreen="fullscreen"
-        :stats="emotes.stats"
-        :user-count="metrics.subscribers"
-        :hide-ui="hideUi"
-        :full-opacity="background === backgrounds.GREENSCREEN"
-        class="absolute z-20 left-0 bottom-0 right-0 h-12"
-      />
+
+      <footer class="mt-12 text-sm text-gray-500">
+        Made by <a href="https://stagetimer.io" class="text-blue-500 hover:text-blue-600 transition-colors">stagetimer.io</a>
+      </footer>
     </div>
-  </VueFullscreen>
+  </div>
 </template>
 
 <script setup>
-import { component as VueFullscreen } from 'vue-fullscreen'
-import SiteHeader from '../components/SiteHeader.vue'
-import SiteFooter from '../components/SiteFooter.vue'
-import EmojiWall from '../components/EmojiWall.vue'
-import EmojiButtons from '../components/EmojiButtons.vue'
-import { useEmotes } from '../store/emotes.js'
-import { useMetrics } from '../store/metrics.js'
-import { params } from '../utils/browserAddressParams.js'
-import backgrounds from '../utils/backgrounds.js'
-import { ref, watch } from 'vue'
-
-const emotes = useEmotes()
-const metrics = useMetrics()
-
-const background = ref(params.background)
-const hideButtons = ref(params.hideButtons)
-const hideUi = ref(params.hideUi)
-const fullscreen = ref(false)
-
-watch(
-  () => background.value,
-  (val) => params.background = val,
-)
-
-watch(
-  () => hideButtons.value,
-  (val) => params.hideButtons = val,
-)
+// Simplified Index page for now - will be replaced with Dashboard functionality later
 </script>
 
 <style scoped>
