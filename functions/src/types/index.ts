@@ -4,20 +4,22 @@ import { ReplaceWithTimestamp } from '../utils/typeUtils'
 export interface Room {
   id: string
   name: string
-  createdAt: Date
-  lastActivity: Date
   settings: {
     emojis: Array<{
       emoji: string
       label?: string
     }>
   }
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface Reaction {
   id: string
   emoji: string
   timestamp: Date
+  createdAt: Date
+  updatedAt: Date
 }
 
 export interface AnalyticsBatch {
@@ -27,12 +29,13 @@ export interface AnalyticsBatch {
   counts: Record<string, number>
   total: number
   createdAt: Date
+  updatedAt: Date
 }
 
-// System fields added by converters
-type RoomSystemFields = 'id'
-type ReactionSystemFields = 'id'
-type AnalyticsBatchSystemFields = 'id'
+// System fields added by converters (id, createdAt, updatedAt)
+type RoomSystemFields = 'id' | 'createdAt' | 'updatedAt'
+type ReactionSystemFields = 'id' | 'createdAt' | 'updatedAt'
+type AnalyticsBatchSystemFields = 'id' | 'createdAt' | 'updatedAt'
 
 // Firestore document types (what's actually stored in DB)
 export type RoomFirestore = ReplaceWithTimestamp<Omit<Room, RoomSystemFields>>

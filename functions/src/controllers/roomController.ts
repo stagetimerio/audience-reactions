@@ -1,5 +1,5 @@
 import { Request, Response } from 'express'
-import { DocumentSnapshot, FieldValue, Query, Timestamp } from 'firebase-admin/firestore'
+import { DocumentSnapshot, Query, Timestamp } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { AnalyticsBatch, DEFAULT_EMOJIS } from '../types'
@@ -17,8 +17,6 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
 
   await roomRef.set({
     name: name || `Room ${roomId}`,
-    createdAt: FieldValue.serverTimestamp(),
-    lastActivity: FieldValue.serverTimestamp(),
     settings: {
       emojis: emojis || DEFAULT_EMOJIS,
     },

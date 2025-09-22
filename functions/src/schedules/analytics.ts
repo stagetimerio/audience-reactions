@@ -1,5 +1,5 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler'
-import { FieldValue, Timestamp } from 'firebase-admin/firestore'
+import { Timestamp } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 
@@ -68,7 +68,6 @@ export const batchAnalytics = onSchedule(
             endTime: Timestamp.fromDate(now),
             counts,
             total,
-            createdAt: FieldValue.serverTimestamp(),
           })
 
           // Delete processed reactions to prevent accumulation

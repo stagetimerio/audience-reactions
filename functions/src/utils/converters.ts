@@ -11,7 +11,7 @@ export interface FromSnapshotConfig {
 
 /**
  * Generic converter from Firestore DocumentSnapshot to entity with Dates
- * - Adds id from snapshot
+ * - Adds id, createdAt, updatedAt from snapshot metadata
  * - Converts Timestamp fields to Date objects
  * - Applies defaults if provided
  */
@@ -28,6 +28,8 @@ export function fromSnapshot<TFirestore, TEntity>(
     ...config.defaults,
     ...data,
     id: snapshot.id,
+    createdAt: snapshot.createTime ? snapshot.createTime.toDate() : new Date(),
+    updatedAt: snapshot.updateTime ? snapshot.updateTime.toDate() : new Date(),
   }
 
   // Convert date fields from Timestamp to Date
@@ -49,9 +51,7 @@ export function fromSnapshot<TFirestore, TEntity>(
  * Convert Room document from Firestore
  */
 export function roomFromSnapshot(snapshot: DocumentSnapshot): Room {
-  return fromSnapshot<RoomFirestore, Room>(snapshot, {
-    dateFields: ['createdAt', 'lastActivity'],
-  })
+  return fromSnapshot<RoomFirestore, Room>(snapshot)
 }
 
 /**
@@ -68,6 +68,6 @@ export function reactionFromSnapshot(snapshot: DocumentSnapshot): Reaction {
  */
 export function analyticsBatchFromSnapshot(snapshot: DocumentSnapshot): AnalyticsBatch {
   return fromSnapshot<AnalyticsBatchFirestore, AnalyticsBatch>(snapshot, {
-    dateFields: ['startTime', 'endTime', 'createdAt'],
+    dateFields: ['startTime', 'endTime'],
   })
 }

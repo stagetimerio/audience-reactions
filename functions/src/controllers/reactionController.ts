@@ -33,8 +33,6 @@ export async function submitReaction(req: Request, res: Response): Promise<void>
     // Create room with default emoji configuration
     await roomRef.set({
       name: `Room ${roomId}`,
-      createdAt: FieldValue.serverTimestamp(),
-      lastActivity: FieldValue.serverTimestamp(),
       settings: {
         emojis: DEFAULT_EMOJIS,
       },
@@ -44,11 +42,6 @@ export async function submitReaction(req: Request, res: Response): Promise<void>
     // Use default emojis for validation
     room = { settings: { emojis: DEFAULT_EMOJIS } }
   } else {
-    // Update last activity
-    await roomRef.update({
-      lastActivity: FieldValue.serverTimestamp(),
-    })
-
     // Convert room data for validation
     room = roomFromSnapshot(roomDoc)
   }
