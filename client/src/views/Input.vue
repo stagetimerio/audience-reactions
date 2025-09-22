@@ -32,19 +32,19 @@
       <!-- Cooldown Notice - Fixed positioned to avoid layout shift -->
       <div
         v-if="cooldownRemaining > 0"
-        class="fixed top-20 left-4 right-4 z-30 bg-yellow-100 border-l-4 border-yellow-500 rounded-r-lg shadow-lg"
+        class="fixed top-20 left-0 right-0 px-5"
       >
-        <div class="p-4">
-          <div class="flex items-center mb-2">
-            <FaIcon icon="clock" class="text-yellow-500 mr-2" />
-            <p class="text-yellow-700 flex-1">
+        <div class="max-w-xl mx-auto z-30 bg-neutral-800 text-neutral-300 shadow-lg rounded-lg p-4">
+          <div class="flex items-center justify-center gap-2 mb-2">
+            <FaIcon icon="clock" />
+            <p>
               Please wait {{ Math.ceil(cooldownRemaining / 1000) }} seconds before sending more reactions
             </p>
           </div>
           <!-- Progress bar -->
-          <div class="w-full bg-yellow-200 rounded-full h-2">
+          <div class="w-full bg-neutral-200 rounded-full h-2">
             <div
-              class="bg-yellow-500 h-2 rounded-full transition-all duration-100 ease-linear"
+              class="bg-neutral-500 h-2 rounded-full transition-all duration-100 ease-linear"
               :style="{ width: `${cooldownProgress}%` }"
             />
           </div>
@@ -83,11 +83,16 @@
                 <div class="text-green-600 text-2xl">✓</div>
               </div>
 
+              <!-- Click count indicator -->
+              <div
+                v-if="getButtonState(emojiConfig.emoji).clickCount > 1"
+                class="absolute top-1 right-1 bg-blue-600 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center"
+              >
+                {{ getButtonState(emojiConfig.emoji).clickCount }}
+              </div>
+
               <div class="text-center">
-                <div class="text-4xl mb-1">{{ emojiConfig.emoji }}</div>
-                <div v-if="emojiConfig.label" class="text-xs text-gray-600 leading-tight">
-                  {{ emojiConfig.label }}
-                </div>
+                <div class="text-4xl">{{ emojiConfig.emoji }}</div>
               </div>
             </button>
           </div>

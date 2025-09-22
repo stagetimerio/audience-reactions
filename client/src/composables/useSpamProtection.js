@@ -1,13 +1,13 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 
-const SPAM_THRESHOLD = 10 // clicks
+const SPAM_THRESHOLD = 15 // clicks
 const SPAM_WINDOW = 10000 // 10 seconds in ms
-const COOLDOWN_DURATION = 5000 // 5 seconds in ms
+const COOLDOWN_DURATION = 10000 // 5 seconds in ms
 
 export function useSpamProtection (roomId) {
   const clicks = ref([])
   const cooldownUntil = ref(0)
-  const buttonStates = ref({}) // emoji -> { lastClick, state }
+  const buttonStates = ref({}) // emoji -> { lastClick, state, clickCount, pendingRequests }
   const forceUpdate = ref(0) // Used to force reactivity updates
 
   const storageKey = `spam_protection_${roomId}`
@@ -146,6 +146,7 @@ export function useSpamProtection (roomId) {
         disabled: true,
         loading: false,
         success: false,
+        clickCount: 0,
       }
     }
 
@@ -158,6 +159,7 @@ export function useSpamProtection (roomId) {
           disabled: false,
           loading: true,
           success: false,
+          clickCount: currentState.pendingRequests || 0,
         }
       }
 
@@ -167,6 +169,7 @@ export function useSpamProtection (roomId) {
           disabled: false,
           loading: false,
           success: true,
+          clickCount: 0,
         }
       }
     }
@@ -176,14 +179,17 @@ export function useSpamProtection (roomId) {
       disabled: false,
       loading: false,
       success: false,
+      clickCount: 0,
     }
   }
 
   // Set button to loading state
   function setButtonLoading (emoji) {
+    const existing = buttonStates.value[emoji]
     buttonStates.value[emoji] = {
       lastClick: Date.now(),
       state: 'loading',
+      pendingRequests: existing ? (existing.pendingRequests || 0) + 1 : 1,
     }
   }
 
@@ -191,6 +197,7 @@ export function useSpamProtection (roomId) {
   function setButtonSuccess (emoji) {
     if (buttonStates.value[emoji]) {
       buttonStates.value[emoji].state = 'success'
+      buttonStates.value[emoji].pendingRequests = 0
     }
   }
 
