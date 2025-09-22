@@ -115,23 +115,71 @@ cd functions && npm run build
 - FontAwesome icons via `<FaIcon>` component
 
 ### Database Schema
-- `/rooms/{roomId}`: Room configuration with name, emojis, optional backgroundImage
+- `/rooms/{roomId}`: Room configuration with name, emojis, optional background images
 - `/rooms/{roomId}/reactions/{reactionId}`: Real-time reaction stream (temporary)
 - `/rooms/{roomId}/analytics/{isoTimestamp}`: Time-windowed analytics batches
 
-### Room Data Structure
+### Type System
+
+#### Core Application Types (`functions/src/types/index.ts`)
+The application uses a two-tier type system to handle the differences between JavaScript/TypeScript Date objects and Firestore Timestamp objects:
+
+1. **Application Types**: Used in business logic with native Date objects
+   - `Room`: Room configuration with emojis and background settings
+   - `Reaction`: Individual emoji reaction with timestamp
+   - `AnalyticsBatch`: Aggregated analytics for a time window
+
+2. **Firestore Types**: What's actually stored in the database
+   - `RoomFirestore`, `ReactionFirestore`, `AnalyticsBatchFirestore`
+   - These omit system fields (id, createdAt, updatedAt) and replace Date with Timestamp
+
 ```typescript
+// Application interface
 interface Room {
   id: string
   name: string
   settings: {
     emojis: Array<{ emoji: string, label?: string }>
-    backgroundImage?: string // Optional full URL
+    backgroundInput?: string  // Optional URL/color for input view
+    backgroundOutput?: string // Optional URL/color for output view
   }
   createdAt: Date
   updatedAt: Date
 }
+
+// Firestore storage type (auto-generated)
+type RoomFirestore = ReplaceWithTimestamp<Omit<Room, 'id' | 'createdAt' | 'updatedAt'>>
 ```
+
+#### Type Converters (`functions/src/utils/converters.ts`)
+The converter system automatically handles the transformation between Firestore documents and application types:
+
+1. **Generic `fromSnapshot` function**:
+   - Adds system fields (id, createdAt, updatedAt) from document metadata
+   - Converts Firestore Timestamps to JavaScript Dates
+   - Applies default values if specified
+   - Handles nested date fields via configuration
+
+2. **Specialized converters**:
+   - `roomFromSnapshot`: Converts Room documents
+   - `reactionFromSnapshot`: Converts Reactions (handles timestamp field)
+   - `analyticsBatchFromSnapshot`: Converts Analytics (handles startTime, endTime)
+
+```typescript
+// Usage example
+const roomDoc = await db.collection('rooms').doc(roomId).get()
+const room = roomFromSnapshot(roomDoc) // Returns fully typed Room with Dates
+```
+
+#### Type Utilities (`functions/src/utils/typeUtils.ts`)
+- `ReplaceWithTimestamp<T>`: Recursively replaces Date fields with Firestore Timestamp
+- `ReplaceWithString<T>`: Recursively replaces Date fields with ISO strings (for JSON serialization)
+
+This type system ensures:
+- Type safety throughout the application
+- Automatic handling of Firestore's Timestamp ↔ Date conversions
+- Consistent addition of system fields (id, createdAt, updatedAt)
+- Clean separation between storage and application concerns
 
 ### Deployment
 - Firebase Functions deployed to `us-central1`
