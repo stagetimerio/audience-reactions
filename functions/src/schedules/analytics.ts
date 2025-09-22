@@ -107,7 +107,7 @@ async function processBatch() {
  */
 export const batchAnalytics = onSchedule(
   {
-    schedule: 'every 30 seconds',
+    schedule: 'every minute',
     timeZone: 'Europe/Berlin',
     maxInstances: 1,
   },
@@ -115,9 +115,9 @@ export const batchAnalytics = onSchedule(
     // First batch execution
     await processBatch()
 
-    // // Wait 30 seconds, then execute again
-    // await new Promise((resolve) => setTimeout(resolve, 30000))
-    // await processBatch()
+    // Wait 30 seconds, then execute again
+    await new Promise((resolve) => setTimeout(resolve, 30000))
+    await processBatch()
   }
 )
 
