@@ -19,6 +19,7 @@ export interface Room {
 export interface Reaction {
   id: string
   emoji: string
+  roomId: string
   timestamp: Date
   createdAt: Date
   updatedAt: Date
