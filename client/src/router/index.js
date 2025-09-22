@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Index from '../views/Index.vue'
 import Input from '../views/Input.vue'
+import Output from '../views/Output.vue'
 import NotFound from '../views/NotFound.vue'
 
 const routes = [
@@ -13,6 +14,12 @@ const routes = [
     path: '/room/:roomId/input',
     name: 'Input',
     component: Input,
+    props: true,
+  },
+  {
+    path: '/room/:roomId/output',
+    name: 'Output',
+    component: Output,
     props: true,
   },
   {

@@ -8,15 +8,13 @@
         :class="{ '!opacity-100 -translate-y-full': fullOpacity }"
         :style="{ left: emote.x + '%' }"
       >
-        {{ keyEmojiMap[emote.key] }}
+        {{ emote.emoji }}
       </div>
     </TransitionGroup>
   </div>
 </template>
 
 <script setup>
-import { keyEmojiMap } from '../store/emotes.js'
-
 const props = defineProps({
   emotes: { type: Array, default: () => [] },
   fullOpacity: Boolean,

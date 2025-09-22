@@ -3,6 +3,6 @@ import vue from '@vitejs/plugin-vue'
 
 // https://vitejs.dev/config/
 export default defineConfig({
-  envPrefix: 'PUBLIC_',
+  envPrefix: 'VITE_',
   plugins: [vue()],
 })

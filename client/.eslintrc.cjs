@@ -17,5 +17,8 @@ module.exports = {
     }],
     'vue/no-multiple-template-root': 'off',
     'vue/multi-word-component-names': 'off',
+    'quotes': ['error', 'single'],
+    'semi': ['error', 'never'],
+    'object-curly-spacing': ['error', 'always'],
   },
 }

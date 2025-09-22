@@ -1,5 +1,4 @@
 import { defineStore } from 'pinia'
-import { publish } from '../services/SocketService.js'
 
 export const HEART = 'heart'
 export const UP = 'up'
@@ -40,7 +39,6 @@ export const useEmotes = defineStore('emotes', {
       this.stats[key] = this.stats[key] + 1 || 1
     },
     add (key) {
-      publish(key)
       this._add(key)
     },
     remove (id) {
