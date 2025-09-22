@@ -27,7 +27,7 @@ jobs:
         run: npm run build --prefix functions
 
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v14
+        uses: w9jds/firebase-action@v14.17.0
         with:
           args: deploy --only functions
         env:
