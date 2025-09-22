@@ -23,6 +23,10 @@
       "ttl": false,
       "indexes": [
         {
+          "order": "DESCENDING",
+          "queryScope": "COLLECTION"
+        },
+        {
           "order": "ASCENDING",
           "queryScope": "COLLECTION_GROUP"
         }
