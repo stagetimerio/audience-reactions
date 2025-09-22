@@ -9,18 +9,25 @@ import { roomFromSnapshot, analyticsBatchFromSnapshot } from '../utils/converter
  * Create a new room with default settings
  */
 export async function createRoom(req: Request, res: Response): Promise<void> {
-  const { name, emojis } = req.body
+  const { name, emojis, backgroundImage } = req.body
 
   // Use Firestore auto-generated ID
   const roomRef = db.collection('rooms').doc()
   const roomId = roomRef.id
 
-  await roomRef.set({
+  const roomData: any = {
     name: name || `Room ${roomId}`,
     settings: {
       emojis: emojis || DEFAULT_EMOJIS,
     },
-  })
+  }
+
+  // Add backgroundImage if provided
+  if (backgroundImage && typeof backgroundImage === 'string') {
+    roomData.settings.backgroundImage = backgroundImage
+  }
+
+  await roomRef.set(roomData)
 
   logger.info(`Created new room: ${roomId}`)
 

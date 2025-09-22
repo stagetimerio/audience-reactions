@@ -9,6 +9,7 @@ export interface Room {
       emoji: string
       label?: string
     }>
+    backgroundImage?: string // Optional full URL to background image
   }
   createdAt: Date
   updatedAt: Date

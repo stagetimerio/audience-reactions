@@ -1,5 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-900 flex flex-col touch-manipulation select-none">
+  <div
+    class="min-h-screen bg-gray-900 flex flex-col touch-manipulation select-none relative"
+    :style="backgroundStyle"
+  >
     <!-- Loading State -->
     <div v-if="loading" class="flex-1 flex items-center justify-center">
       <div class="text-center">
@@ -13,8 +16,8 @@
       <div class="text-center px-4">
         <h2 class="text-xl font-bold text-red-600 mb-2">Room not found</h2>
         <p class="text-gray-600 mb-4">The room "{{ roomId }}" does not exist.</p>
-        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors" @click="$router.push('/404')">
-          Go to 404 page
+        <button class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg transition-colors" @click="$router.push('/')">
+          Go to Home
         </button>
       </div>
     </div>
@@ -59,7 +62,6 @@
                 'relative h-24 text-4xl bg-white rounded-xl shadow-md transition-colors',
                 'touch-manipulation hover:scale-105',
                 'flex items-center justify-center',
-                'border-2 border-transparent',
                 getButtonState(emojiConfig.emoji).class
               ]"
               :disabled="cooldownRemaining > 0"
@@ -115,7 +117,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useSpamProtection } from '../composables/useSpamProtection'
 import { useRoomApi } from '../composables/useRoomApi'
 
@@ -141,6 +143,19 @@ const {
 const loading = ref(true)
 const error = ref(false)
 const roomData = ref(null)
+
+// Computed property for background image style
+const backgroundStyle = computed(() => {
+  if (roomData.value?.settings?.backgroundImage) {
+    return {
+      backgroundImage: `url(${roomData.value.settings.backgroundImage})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+    }
+  }
+  return {}
+})
 
 onMounted(async () => {
   try {

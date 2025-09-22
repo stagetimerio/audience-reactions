@@ -142,7 +142,7 @@ export function useSpamProtection (roomId) {
 
     if (cooldownRemaining.value > 0) {
       return {
-        class: 'border-yellow-400 bg-yellow-50 opacity-75 cursor-not-allowed',
+        class: 'bg-yellow-50 opacity-75 cursor-not-allowed',
         disabled: true,
         loading: false,
         success: false,
@@ -154,7 +154,7 @@ export function useSpamProtection (roomId) {
 
       if (currentState.state === 'loading') {
         return {
-          class: 'border-blue-400 bg-blue-50',
+          class: 'bg-blue-50',
           disabled: false,
           loading: true,
           success: false,
@@ -163,7 +163,7 @@ export function useSpamProtection (roomId) {
 
       if (currentState.state === 'success' && timeSinceClick < 1000) {
         return {
-          class: 'border-green-400 bg-green-50',
+          class: 'bg-green-50',
           disabled: false,
           loading: false,
           success: true,
