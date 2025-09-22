@@ -6,14 +6,17 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
 
 ### ✅ Completed Features
 - **Input Screen**: Mobile-first audience reaction interface (`/room/{roomId}/input`)
+- **Output Screen**: Real-time animated emoji display (`/room/{roomId}/output`)
 - **Spam Protection**: Intelligent cooldown system (10 clicks/10s → 5s cooldown)
 - **Visual Feedback**: Loading states, success animations, progress bars
-- **Background Images**: Optional custom room backgrounds
+- **Background Images**: Optional custom room backgrounds (input screens)
 - **Mobile Optimized**: Touch-friendly, large buttons, no zoom issues
 - **Firebase Backend**: Production-ready API with analytics processing
+- **Real-time Display**: Firebase subscription with performance optimization
+- **Mouse Help System**: One-time overlay with OBS/vMix integration guide
+- **Transparent Background**: Perfect for streaming overlays
 
 ### 🔄 Next Phase
-- **Output Screen**: Animated emoji wall display (`/room/{roomId}/output`)
 - **Dashboard**: Room management and real-time analytics (`/room/{roomId}/dashboard`)
 
 ## Backend Firebase Functions
@@ -124,6 +127,26 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
 ## Real-time Architecture
 
 1. **Input Flow**: Client POST → `submitReaction` → Firestore `/reactions`
-2. **Display Flow**: Output screens subscribe to `/reactions` → Real-time emoji animations
+2. **Display Flow**: Output screens subscribe to `/reactions` → Real-time emoji animations (with 0-120ms random delay)
 3. **Analytics Flow**: `batchAnalytics` → Process `/reactions` → Create `/analytics` → Delete processed reactions
 4. **Dashboard Flow**: Dashboard subscribes to `/analytics` → Live metrics display
+
+## Frontend Architecture
+
+### Key Components
+- **Firebase SDK v12**: Real-time Firestore subscriptions
+- **Vue 3 + Composition API**: Modern reactive framework
+- **EmojiWall Component**: Reusable animated emoji display
+- **Performance Optimization**: 50-emoji limit with FIFO cleanup
+- **Old Reaction Filtering**: Ignores snapshots older than 5 seconds
+- **Natural Timing**: Random delays prevent synchronized emoji bursts
+
+### URL Structure
+- **Input**: `/room/{roomId}/input` - Mobile audience interface
+- **Output**: `/room/{roomId}/output` - Display screen for projectors/streaming
+- **Dashboard**: `/room/{roomId}/dashboard` - Management interface (planned)
+
+### Environment Configuration
+- **Production**: Uses live Firebase (`audience-reactions-prod`)
+- **Development**: Optional emulator mode (`VITE_USE_FIREBASE_EMULATOR=true`)
+- **Overlay Ready**: Transparent background for OBS/vMix integration
