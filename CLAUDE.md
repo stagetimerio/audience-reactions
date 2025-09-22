@@ -54,11 +54,14 @@ cd functions && npm run build
 ### Key Files
 
 #### Frontend
-- `client/src/App.vue`: Main app entry, handles room initialization
-- `client/src/store/emotes.js`: Emoji state management and animation lifecycle
-- `client/src/views/Index.vue`: Main application view
-- `client/src/components/EmojiButtons.vue`: User interaction buttons with cooldown
-- `client/src/components/EmojiWall.vue`: Animated emoji display
+- `client/src/App.vue`: Main app entry with router-view
+- `client/src/views/Index.vue`: Landing page with project overview
+- `client/src/views/Input.vue`: ✅ Mobile-first audience reaction interface
+- `client/src/views/NotFound.vue`: 404 error page
+- `client/src/router/index.js`: Vue Router configuration
+- `client/src/composables/useSpamProtection.js`: ✅ Spam protection with localStorage persistence
+- `client/src/composables/useRoomApi.js`: ✅ HTTP API integration
+- `client/src/plugins/fontawesome.js`: FontAwesome icon setup
 
 #### Backend (Firebase Functions)
 - `functions/src/endpoints/reactionEndpoints.ts`: HTTP API routes
@@ -70,15 +73,29 @@ cd functions && npm run build
 - `functions/src/utils/converters.ts`: Firestore document converters
 
 ### API Endpoints
-- `POST /rooms` - Create new room
-- `GET /rooms/{roomId}` - Get room info
-- `POST /rooms/{roomId}/react` - Submit reaction
+- `POST /rooms` - Create new room (supports optional backgroundImage URL)
+- `GET /rooms/{roomId}` - Get room info with emojis and settings
+- `POST /rooms/{roomId}/react` - Submit reaction (with 600ms backend rate limiting)
 - `GET /rooms/{roomId}/analytics` - Get analytics data
 
+### URL Structure
+- `/` - Landing page
+- `/room/{roomId}/input` - ✅ Mobile audience reaction interface
+- `/room/{roomId}/output` - 🔄 Animated emoji display (planned)
+- `/room/{roomId}/dashboard` - 🔄 Analytics and room management (planned)
+
 ### Environment Setup
-- Copy `client/.env.example` to `client/.env`
+- Environment variables: `client/.env` with `PUBLIC_API_BASE_URL=https://api-vh67faopca-uc.a.run.app`
 - Firebase project configuration in `functions/src/firebase-setup.ts`
 - Production API: `https://api-vh67faopca-uc.a.run.app`
+
+### Features Implemented ✅
+- **Input Screen**: Mobile-first reaction interface with spam protection
+- **Spam Protection**: 10 clicks in 10 seconds → 5-second cooldown (persists through reloads)
+- **Visual Feedback**: Loading/success states for buttons, progress bar for cooldown
+- **Background Images**: Optional room background images (cover size)
+- **Mobile Optimization**: Touch-friendly buttons, no zoom, large targets (96px height)
+- **Error Handling**: Graceful fallbacks for missing rooms
 
 ### Code Style
 - ESLint configured for single quotes, no semicolons, 2-space indentation, space inside curly braces
@@ -89,9 +106,23 @@ cd functions && npm run build
 - FontAwesome icons via `<FaIcon>` component
 
 ### Database Schema
-- `/rooms/{roomId}`: Room configuration and metadata
+- `/rooms/{roomId}`: Room configuration with name, emojis, optional backgroundImage
 - `/rooms/{roomId}/reactions/{reactionId}`: Real-time reaction stream (temporary)
 - `/rooms/{roomId}/analytics/{isoTimestamp}`: Time-windowed analytics batches
+
+### Room Data Structure
+```typescript
+interface Room {
+  id: string
+  name: string
+  settings: {
+    emojis: Array<{ emoji: string, label?: string }>
+    backgroundImage?: string // Optional full URL
+  }
+  createdAt: Date
+  updatedAt: Date
+}
+```
 
 ### Deployment
 - Firebase Functions deployed to `us-central1`

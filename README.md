@@ -1,26 +1,44 @@
 # ❤️ Audience Reacts | by stagetimer.io
 
+A real-time emoji reaction system designed for large-scale live events (50k+ concurrent users). Audiences submit reactions via mobile devices, displayed on shared screens with real-time analytics.
+
+## 🚀 Current Status
+
+### ✅ Completed Features
+- **Input Screen**: Mobile-first audience reaction interface (`/room/{roomId}/input`)
+- **Spam Protection**: Intelligent cooldown system (10 clicks/10s → 5s cooldown)
+- **Visual Feedback**: Loading states, success animations, progress bars
+- **Background Images**: Optional custom room backgrounds
+- **Mobile Optimized**: Touch-friendly, large buttons, no zoom issues
+- **Firebase Backend**: Production-ready API with analytics processing
+
+### 🔄 Next Phase
+- **Output Screen**: Animated emoji wall display (`/room/{roomId}/output`)
+- **Dashboard**: Room management and real-time analytics (`/room/{roomId}/dashboard`)
+
 ## Backend Firebase Functions
 
 ### Deployed Functions
 
-#### 1. `submitReaction` (HTTP Endpoint)
-**Purpose**: Accepts audience emoji reactions via HTTP POST requests
-- **URL**: `https://us-central1-audience-reactions-prod.cloudfunctions.net/submitReaction/api/rooms/{roomId}/react`
-- **Method**: POST
-- **Body**: `{"emoji": "heart", "userId": "optional-user-id"}`
-- **Features**:
-  - Validates emoji types against whitelist: `heart`, `fire`, `laugh`, `clap`, `thumbs`, `star`
-  - Implements 600ms rate limiting per user
-  - Auto-creates rooms with default emoji configuration
-  - Returns structured JSON response with reaction ID
+### Current API Endpoints
 
-**Example Usage**:
-```bash
-curl -X POST "https://api-vh67faopca-uc.a.run.app/rooms/test-room/react" \
-  -H "Content-Type: application/json" \
-  -d '{"emoji": "❤️"}'
-```
+#### Room Management
+- **Create Room**: `POST /rooms`
+  ```bash
+  curl -X POST "https://api-vh67faopca-uc.a.run.app/rooms" \
+    -H "Content-Type: application/json" \
+    -d '{"name": "My Event", "backgroundImage": "https://example.com/bg.jpg"}'
+  ```
+- **Get Room**: `GET /rooms/{roomId}` - Returns room config with emojis and settings
+
+#### Reaction Submission
+- **Submit Reaction**: `POST /rooms/{roomId}/react`
+  ```bash
+  curl -X POST "https://api-vh67faopca-uc.a.run.app/rooms/{roomId}/react" \
+    -H "Content-Type: application/json" \
+    -d '{"emoji": "❤️"}'
+  ```
+- **Features**: 600ms backend rate limiting, emoji validation, auto room creation
 
 **Response**:
 ```json
