@@ -2,6 +2,31 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    // Rooms collection - public read, function-only write
+    match /rooms/{roomId} {
+      // Allow read access to room configuration
+      allow read: if true;
+      // Only allow writes from authenticated functions (not direct client writes)
+      allow write: if false;
+
+      // Reactions subcollection - public read, function-only write
+      match /reactions/{reactionId} {
+        // Allow read access for real-time display
+        allow read: if true;
+        // Only allow writes from authenticated functions
+        allow write: if false;
+      }
+
+      // Analytics subcollection - public read, function-only write
+      match /analytics/{analyticsId} {
+        // Allow read access for dashboard
+        allow read: if true;
+        // Only allow writes from authenticated functions
+        allow write: if false;
+      }
+    }
+
+    // Deny all other document access
     match /{document=**} {
       allow read, write: if false;
     }
