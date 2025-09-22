@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen bg-gray-900 flex flex-col touch-manipulation select-none relative"
+    class="min-h-screen flex flex-col touch-manipulation select-none relative"
     :style="backgroundStyle"
   >
     <!-- Loading State -->
@@ -144,17 +144,32 @@ const loading = ref(true)
 const error = ref(false)
 const roomData = ref(null)
 
-// Computed property for background image style
+// Computed property for background style
 const backgroundStyle = computed(() => {
-  if (roomData.value?.settings?.backgroundImage) {
-    return {
-      backgroundImage: `url(${roomData.value.settings.backgroundImage})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
+  const backgroundInput = roomData.value?.settings?.backgroundInput
+
+  if (backgroundInput) {
+    // Check if it's a URL or a color
+    if (backgroundInput.startsWith('http') || backgroundInput.startsWith('/')) {
+      // It's a URL - use as background image
+      return {
+        backgroundImage: `url(${backgroundInput})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }
+    } else {
+      // It's a color - use as background color
+      return {
+        backgroundColor: backgroundInput,
+      }
     }
   }
-  return {}
+
+  // Default to dark gray
+  return {
+    backgroundColor: '#1f2937', // gray-800
+  }
 })
 
 onMounted(async () => {

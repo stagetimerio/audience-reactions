@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-transparent relative overflow-hidden touch-manipulation select-none">
+  <div class="min-h-screen relative overflow-hidden touch-manipulation select-none" :style="backgroundStyle">
     <!-- Loading State -->
     <div v-if="loading" class="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
       <div class="text-center">
@@ -103,8 +103,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRealtimeReactions } from '../composables/useRealtimeReactions'
+import { useRoomApi } from '../composables/useRoomApi'
 import EmojiWall from '../components/EmojiWall.vue'
 
 const props = defineProps({
@@ -114,8 +115,40 @@ const props = defineProps({
   },
 })
 
+// Room data and API
+const { fetchRoom } = useRoomApi()
+const roomData = ref(null)
+
 // Realtime reactions
 const { reactions, loading, error, connected } = useRealtimeReactions(props.roomId)
+
+// Computed property for background style
+const backgroundStyle = computed(() => {
+  const backgroundOutput = roomData.value?.settings?.backgroundOutput
+
+  if (backgroundOutput) {
+    // Check if it's a URL or a color
+    if (backgroundOutput.startsWith('http') || backgroundOutput.startsWith('/')) {
+      // It's a URL - use as background image
+      return {
+        backgroundImage: `url(${backgroundOutput})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+      }
+    } else {
+      // It's a color - use as background color
+      return {
+        backgroundColor: backgroundOutput,
+      }
+    }
+  }
+
+  // Default to transparent
+  return {
+    backgroundColor: 'transparent',
+  }
+})
 
 // Mouse wiggle help system
 const showHelp = ref(false)
@@ -162,9 +195,17 @@ function triggerDemoReaction (emoji) {
   }, 3000)
 }
 
-// Mouse event listeners
-onMounted(() => {
+// Mouse event listeners and room data fetching
+onMounted(async () => {
   document.addEventListener('mousemove', handleMouseMove)
+
+  // Fetch room data for background settings
+  try {
+    roomData.value = await fetchRoom(props.roomId)
+  } catch (err) {
+    console.error('Failed to fetch room data:', err)
+    // Continue anyway - background will just be transparent
+  }
 })
 
 onUnmounted(() => {
