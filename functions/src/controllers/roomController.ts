@@ -15,7 +15,16 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
   const roomRef = db.collection('rooms').doc()
   const roomId = roomRef.id
 
-  const roomData: any = {
+  interface RoomData {
+    name: string
+    settings: {
+      emojis: typeof DEFAULT_EMOJIS | Array<{ emoji: string; label?: string }>
+      backgroundInput?: string
+      backgroundOutput?: string
+    }
+  }
+
+  const roomData: RoomData = {
     name: name || `Room ${roomId}`,
     settings: {
       emojis: emojis || DEFAULT_EMOJIS,

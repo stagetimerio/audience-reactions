@@ -65,6 +65,7 @@ export async function submitReaction(req: Request, res: Response): Promise<void>
 
   await reactionRef.set({
     emoji,
+    roomId,
     timestamp: FieldValue.serverTimestamp(),
   })
 
