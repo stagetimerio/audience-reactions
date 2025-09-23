@@ -11,7 +11,7 @@
     <div class="max-w-[260px] mx-auto">
       <QrcodeVue
         ref="qrcanvas"
-        class="rounded"
+        class="!w-full !h-auto rounded"
         :value="props.url"
         :size="600"
         :margin="3"
