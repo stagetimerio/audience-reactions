@@ -17,12 +17,12 @@ const props = defineProps({
   size: {
     type: String,
     default: 'md',
-    validator: val => ['sm', 'md', 'lg'].includes(val),
+    validator: (val) => ['sm', 'md', 'lg'].includes(val),
   },
   color: {
     type: String,
     default: 'gray',
-    validator: val => ['gray', 'purple', 'teal', 'green'].includes(val),
+    validator: (val) => ['gray', 'purple', 'teal', 'green'].includes(val),
   },
   light: Boolean,
   inline: Boolean,

@@ -155,7 +155,7 @@ export function useRealtimeAnalytics (roomId) {
     }
 
     // Get room emojis for color assignment and filtering
-    const roomEmojis = room.value?.settings?.emojis?.map(e => e.emoji) || []
+    const roomEmojis = room.value?.settings?.emojis?.map((e) => e.emoji) || []
     console.log('[Analytics] Room emojis:', roomEmojis)
 
     // Color palette - pre-define one color per room emoji
@@ -177,7 +177,7 @@ export function useRealtimeAnalytics (roomId) {
     })
 
     // Merge actual analytics data into the full timeframe with fuzzy matching
-    analytics.value.forEach(batch => {
+    analytics.value.forEach((batch) => {
       // Find the closest time slot (within 15 seconds tolerance)
       let bestMatchIndex = -1
       let bestMatchDiff = Infinity
@@ -215,7 +215,7 @@ export function useRealtimeAnalytics (roomId) {
 
       return {
         label: emoji,
-        data: fullTimeframe.map(slot => slot.counts[emoji] || 0),
+        data: fullTimeframe.map((slot) => slot.counts[emoji] || 0),
         fill: true,
         borderColor: color,
         backgroundColor: color + '99', // Add transparency for stacking
@@ -238,11 +238,11 @@ export function useRealtimeAnalytics (roomId) {
   // Computed property to get summary statistics
   const summaryStats = computed(() => {
     // Get room emojis for consistent ordering (always show these)
-    const roomEmojis = room.value?.settings?.emojis?.map(e => e.emoji) || []
+    const roomEmojis = room.value?.settings?.emojis?.map((e) => e.emoji) || []
 
     // Initialize emoji breakdown with room emojis (always show with 0)
     const emojiBreakdown = {}
-    roomEmojis.forEach(emoji => {
+    roomEmojis.forEach((emoji) => {
       emojiBreakdown[emoji] = 0
     })
 
@@ -251,7 +251,7 @@ export function useRealtimeAnalytics (roomId) {
 
     if (analytics.value.length > 0) {
       // Sum up counts from all analytics batches
-      analytics.value.forEach(batch => {
+      analytics.value.forEach((batch) => {
         Object.entries(batch.counts).forEach(([emoji, count]) => {
           if (roomEmojis.includes(emoji)) {
             emojiBreakdown[emoji] = (emojiBreakdown[emoji] || 0) + count

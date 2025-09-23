@@ -208,10 +208,9 @@ const props = defineProps({
 })
 
 function changeBackground () {
-  const i = backgrounds.values.findIndex(val => val === props.background)
+  const i = backgrounds.values.findIndex((val) => val === props.background)
   emit('update:background', backgrounds.values[i + 1] || backgrounds.values[0])
 }
-
 
 const link = ref(window.location.href)
 function openShareLink () {

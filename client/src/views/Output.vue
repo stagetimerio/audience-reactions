@@ -188,7 +188,7 @@ function triggerDemoReaction (emoji) {
 
   // Remove demo reaction after animation
   setTimeout(() => {
-    const index = reactions.value.findIndex(r => r.id === demoReaction.id)
+    const index = reactions.value.findIndex((r) => r.id === demoReaction.id)
     if (index > -1) {
       reactions.value.splice(index, 1)
     }

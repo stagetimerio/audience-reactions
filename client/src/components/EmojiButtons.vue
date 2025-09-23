@@ -34,7 +34,7 @@ import { emoteKeys, keyEmojiMap } from '../store/emotes.js'
 import { ref } from 'vue'
 
 const cooldown = ref(false)
-const emit =  defineEmits(['trigger-emote'])
+const emit = defineEmits(['trigger-emote'])
 const props = defineProps({
   fullOpacity: Boolean,
 })

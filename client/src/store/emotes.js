@@ -28,7 +28,7 @@ export const useEmotes = defineStore('emotes', {
     duration: 5000,
   }),
   getters: {
-    all: state => Object.values(state.emotes),
+    all: (state) => Object.values(state.emotes),
   },
   actions: {
     _add (key) {

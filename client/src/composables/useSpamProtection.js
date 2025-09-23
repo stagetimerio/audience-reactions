@@ -28,7 +28,7 @@ export function useSpamProtection (roomId) {
         if (data.clicks) {
           // Only keep recent clicks
           const now = Date.now()
-          clicks.value = data.clicks.filter(time => now - time < SPAM_WINDOW)
+          clicks.value = data.clicks.filter((time) => now - time < SPAM_WINDOW)
         }
       }
     } catch (err) {
@@ -113,7 +113,7 @@ export function useSpamProtection (roomId) {
     const now = Date.now()
 
     // Clean old clicks
-    clicks.value = clicks.value.filter(time => now - time < SPAM_WINDOW)
+    clicks.value = clicks.value.filter((time) => now - time < SPAM_WINDOW)
 
     // Add new click
     clicks.value.push(now)

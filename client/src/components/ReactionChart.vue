@@ -1,7 +1,7 @@
 <template>
   <div class="reaction-chart-container">
     <div class="chart-wrapper">
-      <canvas ref="chartCanvas"></canvas>
+      <canvas ref="chartCanvas" />
     </div>
     <div v-if="summaryStats" class="stats-summary">
       <div class="stat-item total-reactions">
@@ -39,15 +39,15 @@ Chart.defaults.font.size = 11
 const props = defineProps({
   chartData: {
     type: Object,
-    default: null
+    default: null,
   },
   summaryStats: {
     type: Object,
     default: () => ({
       totalReactions: 0,
-      emojiBreakdown: {}
-    })
-  }
+      emojiBreakdown: {},
+    }),
+  },
 })
 
 const chartCanvas = ref(null)
@@ -80,9 +80,9 @@ const updateChart = () => {
             usePointStyle: true,
             padding: 15,
             font: {
-              size: 12
-            }
-          }
+              size: 12,
+            },
+          },
         },
         tooltip: {
           mode: 'index',
@@ -94,9 +94,9 @@ const updateChart = () => {
             footer: (tooltipItems) => {
               const total = tooltipItems.reduce((sum, item) => sum + item.parsed.y, 0)
               return `Total: ${total}`
-            }
-          }
-        }
+            },
+          },
+        },
       },
       scales: {
         x: {
@@ -104,11 +104,11 @@ const updateChart = () => {
           ticks: {
             maxTicksLimit: 10,
             maxRotation: 0,
-            autoSkip: true
+            autoSkip: true,
           },
           grid: {
-            display: false
-          }
+            display: false,
+          },
         },
         y: {
           display: true,
@@ -116,24 +116,24 @@ const updateChart = () => {
           beginAtZero: true,
           ticks: {
             stepSize: 1,
-            precision: 0
+            precision: 0,
           },
           grid: {
             drawBorder: false,
-            borderDash: [2, 2]
-          }
-        }
+            borderDash: [2, 2],
+          },
+        },
       },
       elements: {
         line: {
-          tension: 0.4
+          tension: 0.4,
         },
         point: {
           radius: 0,
-          hoverRadius: 4
-        }
-      }
-    }
+          hoverRadius: 4,
+        },
+      },
+    },
   }
 
   if (chartInstance) {

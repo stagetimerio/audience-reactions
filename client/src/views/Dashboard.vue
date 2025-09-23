@@ -3,7 +3,7 @@
     <!-- Loading state -->
     <div v-if="loading" class="flex items-center justify-center min-h-screen">
       <div class="text-center">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4" />
         <p class="text-gray-600">Validating access...</p>
       </div>
     </div>
@@ -31,7 +31,7 @@
           <h1 class="text-3xl font-bold text-gray-900">Room Dashboard</h1>
           <div class="text-sm text-gray-500">Room ID: {{ roomId }}</div>
         </div>
-        <div class="h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full"></div>
+        <div class="h-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full" />
       </div>
 
       <!-- Room Management Section -->
@@ -40,7 +40,7 @@
         <div class="bg-white rounded-lg shadow-sm border p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Room Settings</h2>
 
-          <form @submit.prevent="updateRoom" class="space-y-4">
+          <form class="space-y-4" @submit.prevent="updateRoom">
             <!-- Room Name -->
             <div>
               <label class="block text-sm font-medium text-gray-700 mb-1">Room Name</label>
@@ -72,8 +72,8 @@
                   <button
                     v-if="roomForm.emojis.length > 2"
                     type="button"
-                    @click="removeEmoji(index)"
                     class="text-red-600 hover:text-red-800 px-2"
+                    @click="removeEmoji(index)"
                   >
                     ✕
                   </button>
@@ -82,8 +82,8 @@
               <button
                 v-if="roomForm.emojis.length < 6"
                 type="button"
-                @click="addEmoji"
                 class="text-blue-600 hover:text-blue-800 text-sm mt-2"
+                @click="addEmoji"
               >
                 + Add Emoji
               </button>
@@ -122,7 +122,7 @@
               class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span v-if="updateLoading" class="flex items-center justify-center">
-                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2" />
                 Updating...
               </span>
               <span v-else>Update Room</span>
@@ -153,14 +153,14 @@
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm font-mono"
                 >
                 <button
-                  @click="copyToClipboard(inputUrl, 'input')"
                   class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  @click="copyToClipboard(inputUrl, 'input')"
                 >
                   {{ copyStatus.input ? '✓' : 'Copy' }}
                 </button>
                 <button
-                  @click="showQrCode(inputUrl, 'input-qr')"
                   class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  @click="showQrCode(inputUrl, 'input-qr')"
                 >
                   QR
                 </button>
@@ -180,14 +180,14 @@
                   class="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm font-mono"
                 >
                 <button
-                  @click="copyToClipboard(outputUrl, 'output')"
                   class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  @click="copyToClipboard(outputUrl, 'output')"
                 >
                   {{ copyStatus.output ? '✓' : 'Copy' }}
                 </button>
                 <button
-                  @click="showQrCode(outputUrl, 'output-qr')"
                   class="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors text-sm"
+                  @click="showQrCode(outputUrl, 'output-qr')"
                 >
                   QR
                 </button>
@@ -207,8 +207,8 @@
                   class="flex-1 px-3 py-2 border border-red-300 rounded-md bg-red-50 text-sm font-mono"
                 >
                 <button
-                  @click="copyToClipboard(dashboardUrl, 'dashboard')"
                   class="px-3 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors text-sm"
+                  @click="copyToClipboard(dashboardUrl, 'dashboard')"
                 >
                   {{ copyStatus.dashboard ? '✓' : 'Copy' }}
                 </button>
@@ -225,7 +225,7 @@
         <!-- Loading state -->
         <div v-if="analyticsLoading && !chartData" class="flex items-center justify-center h-96">
           <div class="text-center">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2" />
             <p class="text-gray-600">Loading analytics...</p>
           </div>
         </div>
@@ -312,11 +312,11 @@ const dashboardUrl = computed(() => `${baseUrl.value}/room/${roomId}?sig=${signa
 const API_BASE_URL = import.meta.env.PUBLIC_API_BASE_URL || 'https://api-vh67faopca-uc.a.run.app'
 
 // Validate signature and load room data
-async function validateAndLoadRoom() {
+async function validateAndLoadRoom () {
   try {
     // Validate signature
     const validateResponse = await fetch(
-      `${API_BASE_URL}/rooms/${roomId}/validate-signature?sig=${signature}`
+      `${API_BASE_URL}/rooms/${roomId}/validate-signature?sig=${signature}`,
     )
     const validateResult = await validateResponse.json()
 
@@ -336,10 +336,9 @@ async function validateAndLoadRoom() {
 
     // Populate form
     roomForm.name = roomData.name || ''
-    roomForm.emojis = roomData.settings?.emojis?.map(e => e.emoji) || ['❤️', '🔥', '👏']
+    roomForm.emojis = roomData.settings?.emojis?.map((e) => e.emoji) || ['❤️', '🔥', '👏']
     roomForm.backgroundInput = roomData.settings?.backgroundInput || ''
     roomForm.backgroundOutput = roomData.settings?.backgroundOutput || ''
-
   } catch (err) {
     error.value = 'Unable to load room data. Please check your connection and try again.'
     console.error('Dashboard load error:', err)
@@ -349,7 +348,7 @@ async function validateAndLoadRoom() {
 }
 
 // Update room settings
-async function updateRoom() {
+async function updateRoom () {
   updateLoading.value = true
   updateSuccess.value = false
 
@@ -357,10 +356,10 @@ async function updateRoom() {
     const updateData = {
       name: roomForm.name,
       settings: {
-        emojis: roomForm.emojis.filter(e => e.trim()).map(emoji => ({ emoji })),
+        emojis: roomForm.emojis.filter((e) => e.trim()).map((emoji) => ({ emoji })),
         backgroundInput: roomForm.backgroundInput || undefined,
-        backgroundOutput: roomForm.backgroundOutput || undefined
-      }
+        backgroundOutput: roomForm.backgroundOutput || undefined,
+      },
     }
 
     const response = await fetch(
@@ -368,8 +367,8 @@ async function updateRoom() {
       {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(updateData)
-      }
+        body: JSON.stringify(updateData),
+      },
     )
 
     if (!response.ok) {
@@ -378,8 +377,9 @@ async function updateRoom() {
     }
 
     updateSuccess.value = true
-    setTimeout(() => { updateSuccess.value = false }, 3000)
-
+    setTimeout(() => {
+      updateSuccess.value = false
+    }, 3000)
   } catch (err) {
     alert(`Update failed: ${err.message}`)
   } finally {
@@ -388,31 +388,33 @@ async function updateRoom() {
 }
 
 // Emoji management
-function addEmoji() {
+function addEmoji () {
   if (roomForm.emojis.length < 6) {
     roomForm.emojis.push('')
   }
 }
 
-function removeEmoji(index) {
+function removeEmoji (index) {
   if (roomForm.emojis.length > 2) {
     roomForm.emojis.splice(index, 1)
   }
 }
 
 // Copy to clipboard
-async function copyToClipboard(text, type) {
+async function copyToClipboard (text, type) {
   try {
     await navigator.clipboard.writeText(text)
     copyStatus[type] = true
-    setTimeout(() => { copyStatus[type] = false }, 2000)
+    setTimeout(() => {
+      copyStatus[type] = false
+    }, 2000)
   } catch (err) {
     console.error('Copy failed:', err)
   }
 }
 
 // Show QR code modal
-function showQrCode(url, filename) {
+function showQrCode (url, filename) {
   qrModal.url = url
   qrModal.filename = filename
   qrModal.open = true

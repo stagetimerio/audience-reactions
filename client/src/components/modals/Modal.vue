@@ -93,12 +93,12 @@ const props = defineProps({
   alignV: {
     type: String,
     default: 'center',
-    validator: val => ['top', 'center', 'bottom'].includes(val),
+    validator: (val) => ['top', 'center', 'bottom'].includes(val),
   },
   alignH: {
     type: String,
     default: 'center',
-    validator: val => ['left', 'center', 'right'].includes(val),
+    validator: (val) => ['left', 'center', 'right'].includes(val),
   },
 })
 
