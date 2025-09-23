@@ -34,5 +34,6 @@ module.exports = {
     'max-len': ['error', { 'code': 120, 'ignoreUrls': true }],
     'valid-jsdoc': 'off',
     '@typescript-eslint/no-explicit-any': 'off',
+    'operator-linebreak': ['warn', 'before'],
   },
 }

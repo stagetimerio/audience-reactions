@@ -1,9 +1,11 @@
 import { Request, Response } from 'express'
 import { DocumentSnapshot, Query, Timestamp } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
+import { merge } from 'lodash'
 import { db } from '../firebase-setup'
 import { AnalyticsBatch, DEFAULT_EMOJIS } from '../types'
 import { roomFromSnapshot, analyticsBatchFromSnapshot } from '../utils/converters'
+import { generateDashboardUrl, validateSignature as validateSig } from '../utils/signature'
 
 /**
  * Create a new room with default settings
@@ -44,15 +46,16 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
 
   logger.info(`Created new room: ${roomId}`)
 
+  // Generate dashboard URL with signature
+  const dashboardUrl = generateDashboardUrl(roomId)
+
   res.status(201).json({
     success: true,
-    roomId,
-    name: name || `Room ${roomId}`,
-    urls: {
-      input: `/rooms/${roomId}/input`,
-      output: `/rooms/${roomId}/output`,
-      dashboard: `/rooms/${roomId}/dashboard`,
-    },
+    id: roomId,
+    name: roomData.name,
+    settings: roomData.settings,
+    createdAt: new Date().toISOString(),
+    dashboardUrl,
   })
 }
 
@@ -163,4 +166,119 @@ export async function getRoom(req: Request, res: Response): Promise<void> {
       dashboard: `/rooms/${roomId}/dashboard`,
     },
   })
+}
+
+/**
+ * Validate a signature for a room
+ */
+export function validateSignature(req: Request, res: Response): void {
+  const { roomId } = req.params
+  const signature = req.query.sig as string
+
+  if (!roomId) {
+    res.status(400).json({ error: 'Room ID is required' })
+    return
+  }
+
+  if (!signature) {
+    res.status(400).json({ error: 'Signature is required' })
+    return
+  }
+
+  try {
+    const isValid = validateSig(roomId, signature)
+    res.json({ valid: isValid })
+  } catch (error) {
+    logger.error('Signature validation error:', error)
+    res.status(500).json({
+      error: 'Signature validation failed',
+      message: 'Unable to validate signature',
+    })
+  }
+}
+
+/**
+ * Update room settings (requires valid signature)
+ */
+export async function updateRoom(req: Request, res: Response): Promise<void> {
+  const { roomId } = req.params
+  const { name, settings } = req.body
+
+  if (!roomId) {
+    res.status(400).json({ error: 'Room ID is required' })
+    return
+  }
+
+  // Get room document
+  const roomRef = db.collection('rooms').doc(roomId)
+  const roomDoc = await roomRef.get()
+
+  if (!roomDoc.exists) {
+    res.status(404).json({ error: 'Room not found' })
+    return
+  }
+
+  try {
+    const currentRoom = roomFromSnapshot(roomDoc)
+
+    // Validate emoji count if provided
+    if (settings?.emojis && Array.isArray(settings.emojis)) {
+      if (settings.emojis.length < 2 || settings.emojis.length > 6) {
+        res.status(400).json({
+          error: 'Invalid emoji count',
+          message: 'Room must have between 2 and 6 emojis',
+        })
+        return
+      }
+      // Normalize emoji format
+      settings.emojis = settings.emojis.map((emoji: any) =>
+        typeof emoji === 'string'
+          ? { emoji }
+          : { emoji: emoji.emoji || emoji, ...(emoji.label && { label: emoji.label }) }
+      )
+    }
+
+    // Clean up null/undefined backgrounds
+    if (settings) {
+      if (settings.backgroundInput === null || settings.backgroundInput === '') {
+        delete settings.backgroundInput
+      }
+      if (settings.backgroundOutput === null || settings.backgroundOutput === '') {
+        delete settings.backgroundOutput
+      }
+    }
+
+    // Merge updates with existing data
+    const updateData = merge(
+      {},
+      { name: currentRoom.name, settings: currentRoom.settings },
+      { ...(name && { name }), ...(settings && { settings }) }
+    )
+
+    // Check if there are actual changes
+    if (JSON.stringify(updateData) === JSON.stringify({ name: currentRoom.name, settings: currentRoom.settings })) {
+      res.status(400).json({ error: 'No changes detected' })
+      return
+    }
+
+    // Perform update
+    await roomRef.update(updateData)
+
+    // Get updated room data
+    const updatedRoomDoc = await roomRef.get()
+    const updatedRoom = roomFromSnapshot(updatedRoomDoc)
+
+    logger.info(`Updated room: ${roomId}`)
+
+    res.json({
+      success: true,
+      room: updatedRoom,
+    })
+  } catch (error) {
+    logger.error('Room update error:', error)
+    res.status(500).json({
+      error: 'Failed to update room',
+      message: error instanceof Error ? error.message : 'Unknown error',
+    })
+  }
 }

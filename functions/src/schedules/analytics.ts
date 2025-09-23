@@ -93,14 +93,14 @@ async function processBatch() {
     // Commit all changes in a single batch
     await batch.commit()
 
-    logger.info(`Analytics batching completed: processed ${allReactions.size} reactions ` +
-      `from ${Object.keys(roomGroups).length} rooms`)
+    logger.info(`Analytics batching completed: processed ${allReactions.size} reactions `
+      + `from ${Object.keys(roomGroups).length} rooms`)
   } catch (error) {
     // Check if error is due to missing index
     const err = error as any
     if (err?.code === 9 || err?.message?.includes('FAILED_PRECONDITION')) {
-      logger.error('Missing Firestore index for collection group query. ' +
-        'Deploy the index using: firebase deploy --only firestore:indexes', error)
+      logger.error('Missing Firestore index for collection group query. '
+        + 'Deploy the index using: firebase deploy --only firestore:indexes', error)
     } else {
       logger.error('Error in analytics batching:', error)
     }
