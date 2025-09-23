@@ -249,15 +249,22 @@ export function useRealtimeAnalytics (roomId) {
     // Calculate totals from actual analytics data if available
     let totalReactions = 0
 
+    // Calculate the cutoff time for valid analytics (30 minutes ago)
+    const now = new Date()
+    const cutoffTime = new Date(now.getTime() - (ANALYTICS_TIME_WINDOW_MINUTES * 60 * 1000))
+
     if (analytics.value.length > 0) {
-      // Sum up counts from all analytics batches
+      // Sum up counts only from analytics batches within the time window
       analytics.value.forEach((batch) => {
-        Object.entries(batch.counts).forEach(([emoji, count]) => {
-          if (roomEmojis.includes(emoji)) {
-            emojiBreakdown[emoji] = (emojiBreakdown[emoji] || 0) + count
-            totalReactions += count
-          }
-        })
+        // Only count batches that have endTime within our time window
+        if (batch.endTime && batch.endTime >= cutoffTime) {
+          Object.entries(batch.counts).forEach(([emoji, count]) => {
+            if (roomEmojis.includes(emoji)) {
+              emojiBreakdown[emoji] = (emojiBreakdown[emoji] || 0) + count
+              totalReactions += count
+            }
+          })
+        }
       })
     }
 

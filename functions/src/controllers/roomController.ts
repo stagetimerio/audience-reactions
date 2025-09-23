@@ -109,9 +109,13 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
     const analyticsData = analyticsSnapshot.docs.map((doc: DocumentSnapshot) => analyticsBatchFromSnapshot(doc))
 
     // Calculate summary statistics
+    // Since startTime was removed, calculate it from endTime minus batch interval (20 seconds)
+    const BATCH_INTERVAL_MS = 20 * 1000 // 20 seconds in milliseconds
     const summary = {
       totalReactions: analyticsData.reduce((sum: number, batch: AnalyticsBatch) => sum + batch.total, 0),
-      periodStart: analyticsData.length > 0 ? analyticsData[analyticsData.length - 1].startTime : null,
+      periodStart: analyticsData.length > 0
+        ? new Date(analyticsData[analyticsData.length - 1].endTime.getTime() - BATCH_INTERVAL_MS)
+        : null,
       periodEnd: analyticsData.length > 0 ? analyticsData[0].endTime : null,
       batchCount: analyticsData.length,
     }
