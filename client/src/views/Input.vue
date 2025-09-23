@@ -126,7 +126,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useSpamProtection } from '../composables/useSpamProtection'
 import { useRoomApi } from '../composables/useRoomApi'
 
@@ -183,6 +183,9 @@ const backgroundStyle = computed(() => {
 })
 
 onMounted(async () => {
+  // Add classes to prevent zoom and scrolling on mobile
+  document.body.classList.add('h-svh', 'overflow-hidden', 'touch-manipulation')
+
   // Fetch room data
   try {
     roomData.value = await fetchRoom(props.roomId)
@@ -192,6 +195,10 @@ onMounted(async () => {
     error.value = true
     loading.value = false
   }
+})
+
+onBeforeUnmount(() => {
+  document.body.classList.remove('h-svh', 'overflow-hidden', 'touch-manipulation')
 })
 
 async function submitReaction (emoji) {
