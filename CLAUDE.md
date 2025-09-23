@@ -26,8 +26,8 @@ npm run deploy   # Deploy to Firebase
 
 ### Linting & Type Checking
 ```bash
-# Run from project root - covers both root and client
-npx eslint .
+# ESLint (client - modern flat config)
+cd client && npx eslint
 
 # TypeScript compilation check (functions)
 cd functions && npm run build
@@ -116,12 +116,15 @@ cd functions && npm run build
 - **High-Frequency Analytics**: 20-second batch intervals for granular data visualization
 
 ### Code Style
-- ESLint configured for single quotes, no semicolons, 2-space indentation, space inside curly braces
-- Vue 3 Composition API with `<script setup>` syntax (frontend)
-- TypeScript with strict types and utility type patterns (backend)
-- Express v5 with native async function handling
-- Pinia stores for state management
-- FontAwesome icons via `<FaIcon>` component
+- **ESLint**: Each subdirectory (`client/`, `functions/`) has independent ESLint configuration
+  - `client/`: Modern flat config with @stylistic plugin for Vue 3 + Composition API
+  - `functions/`: Traditional ESLint config for TypeScript backend code
+- **Frontend**: Single quotes, no semicolons, 2-space indentation, space inside curly braces
+- **Vue 3**: Composition API with `<script setup>` syntax
+- **TypeScript**: Strict types and utility type patterns (backend)
+- **Express v5**: Native async function handling
+- **Pinia**: State management
+- **FontAwesome**: Icons via `<FaIcon>` component
 
 ### Database Schema
 - `/rooms/{roomId}`: Room configuration with name, emojis, optional background images

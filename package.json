@@ -12,9 +12,5 @@
   "main": "client/index.html",
   "scripts": {
     "version": "node syncVersion.js && git add **/package*"
-  },
-  "devDependencies": {
-    "eslint": "^8.46.0",
-    "eslint-plugin-no-only-tests": "^3.1.0"
   }
 }
