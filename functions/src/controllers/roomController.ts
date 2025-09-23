@@ -64,11 +64,40 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
  */
 export async function getAnalytics(req: Request, res: Response): Promise<void> {
   const { roomId } = req.params
-  const { startTime, endTime, limit = 100 } = req.query
+  const { from, to } = req.query
 
   // Validate room ID
   if (!roomId) {
     res.status(400).json({ error: 'Room ID is required' })
+    return
+  }
+
+  // Enforce required query parameters
+  if (!from || !to) {
+    res.status(400).json({
+      error: 'Both "from" and "to" query parameters are required',
+      message: 'Please provide ISO string timestamps for both from and to parameters'
+    })
+    return
+  }
+
+  // Validate ISO string format
+  const fromDate = new Date(from as string)
+  const toDate = new Date(to as string)
+
+  if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
+    res.status(400).json({
+      error: 'Invalid date format',
+      message: 'Both "from" and "to" must be valid ISO string timestamps'
+    })
+    return
+  }
+
+  if (fromDate >= toDate) {
+    res.status(400).json({
+      error: 'Invalid time range',
+      message: '"from" must be earlier than "to"'
+    })
     return
   }
 
@@ -82,26 +111,19 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   }
 
   try {
+    const BATCH_INTERVAL_MS = 20 * 1000 // 20 seconds in milliseconds
+
+    // Add 20-second buffer to the beginning and end to ensure complete coverage
+    const queryFromDate = new Date(fromDate.getTime() - BATCH_INTERVAL_MS)
+    const queryToDate = new Date(toDate.getTime() + BATCH_INTERVAL_MS)
+
     // Build analytics query
-    let query: Query = roomRef.collection('analytics')
-
-    // Apply time filters if provided
-    if (startTime) {
-      const startDate = new Date(startTime as string)
-      if (!isNaN(startDate.getTime())) {
-        query = query.where('endTime', '>=', Timestamp.fromDate(startDate))
-      }
-    }
-
-    if (endTime) {
-      const endDate = new Date(endTime as string)
-      if (!isNaN(endDate.getTime())) {
-        query = query.where('startTime', '<=', Timestamp.fromDate(endDate))
-      }
-    }
-
-    // Order by time and apply limit
-    query = query.orderBy('endTime', 'desc').limit(Number(limit))
+    // Since analyticsBatches only have endTime, we query for endTime >= queryFrom and endTime <= queryTo
+    // This ensures we get all batches that might overlap with our time window
+    const query: Query = roomRef.collection('analytics')
+      .where('endTime', '>=', Timestamp.fromDate(queryFromDate))
+      .where('endTime', '<=', Timestamp.fromDate(queryToDate))
+      .orderBy('endTime', 'asc')
 
     const analyticsSnapshot = await query.get()
 
@@ -109,15 +131,13 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
     const analyticsData = analyticsSnapshot.docs.map((doc: DocumentSnapshot) => analyticsBatchFromSnapshot(doc))
 
     // Calculate summary statistics
-    // Since startTime was removed, calculate it from endTime minus batch interval (20 seconds)
-    const BATCH_INTERVAL_MS = 20 * 1000 // 20 seconds in milliseconds
     const summary = {
       totalReactions: analyticsData.reduce((sum: number, batch: AnalyticsBatch) => sum + batch.total, 0),
-      periodStart: analyticsData.length > 0
-        ? new Date(analyticsData[analyticsData.length - 1].endTime.getTime() - BATCH_INTERVAL_MS)
-        : null,
-      periodEnd: analyticsData.length > 0 ? analyticsData[0].endTime : null,
+      periodStart: fromDate,
+      periodEnd: toDate,
       batchCount: analyticsData.length,
+      queryPeriodStart: queryFromDate,
+      queryPeriodEnd: queryToDate,
     }
 
     // Convert room data using converter
