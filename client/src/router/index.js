@@ -25,7 +25,7 @@ const routes = [
   },
   {
     path: '/room/:roomId',
-    name: 'Dashboard',
+    name: 'dashboard',
     component: Dashboard,
     props: true,
   },

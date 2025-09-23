@@ -32,8 +32,26 @@ export function useRoomApi () {
     return data
   }
 
+  async function createRoom (roomData) {
+    const response = await fetch(`${API_BASE_URL}/rooms`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(roomData),
+    })
+
+    if (!response.ok) {
+      throw new Error(`Failed to create room: ${response.status}`)
+    }
+
+    const data = await response.json()
+    return data
+  }
+
   return {
     fetchRoom,
     submitReaction,
+    createRoom,
   }
 }
