@@ -68,6 +68,6 @@ export function reactionFromSnapshot(snapshot: DocumentSnapshot): Reaction {
  */
 export function analyticsBatchFromSnapshot(snapshot: DocumentSnapshot): AnalyticsBatch {
   return fromSnapshot<AnalyticsBatchFirestore, AnalyticsBatch>(snapshot, {
-    dateFields: ['startTime', 'endTime'],
+    dateFields: ['endTime'],
   })
 }

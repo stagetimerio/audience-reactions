@@ -27,7 +27,6 @@ export interface Reaction {
 
 export interface AnalyticsBatch {
   id: string
-  startTime: Date
   endTime: Date
   counts: Record<string, number>
   total: number

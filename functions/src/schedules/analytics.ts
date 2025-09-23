@@ -109,8 +109,8 @@ async function processBatch() {
 }
 
 /**
- * Scheduled function that runs every 30 seconds and executes batching twice
- * First execution immediately, second after 30-second delay
+ * Scheduled function that runs every 20 seconds and executes batching twice
+ * First execution immediately, 2nd + 3rd after 20-second delays
  */
 export const batchAnalytics = onSchedule(
   {
@@ -122,8 +122,12 @@ export const batchAnalytics = onSchedule(
     // First batch execution
     await processBatch()
 
-    // Wait 30 seconds, then execute again
-    await new Promise((resolve) => setTimeout(resolve, 30000))
+    // Wait 20 seconds, then execute again
+    await new Promise((resolve) => setTimeout(resolve, 20000))
+    await processBatch()
+
+    // Wait 20 seconds, then execute again
+    await new Promise((resolve) => setTimeout(resolve, 20000))
     await processBatch()
   }
 )

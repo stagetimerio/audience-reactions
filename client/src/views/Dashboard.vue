@@ -218,15 +218,33 @@
         </div>
       </div>
 
-      <!-- Analytics Placeholder -->
+      <!-- Live Analytics -->
       <div class="bg-white rounded-lg shadow-sm border p-6">
-        <h2 class="text-xl font-semibold text-gray-900 mb-4">Live Analytics</h2>
-        <div class="flex items-center justify-center h-64 border-2 border-dashed border-gray-300 rounded-lg">
+        <h2 class="text-xl font-semibold text-gray-900 mb-4">Live Analytics (Last 10 Minutes)</h2>
+
+        <!-- Loading state -->
+        <div v-if="analyticsLoading && !chartData" class="flex items-center justify-center h-96">
           <div class="text-center">
-            <div class="text-gray-400 text-4xl mb-2">📊</div>
-            <p class="text-gray-500 font-medium">Live analytics coming soon</p>
-            <p class="text-gray-400 text-sm">Real-time emoji reaction graphs will appear here</p>
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto mb-2"></div>
+            <p class="text-gray-600">Loading analytics...</p>
           </div>
+        </div>
+
+        <!-- Error state -->
+        <div v-else-if="analyticsError" class="flex items-center justify-center h-96">
+          <div class="text-center">
+            <div class="text-red-600 text-3xl mb-2">⚠️</div>
+            <p class="text-gray-600">Unable to load analytics</p>
+            <p class="text-gray-400 text-sm">{{ analyticsError }}</p>
+          </div>
+        </div>
+
+        <!-- Chart display -->
+        <div v-else>
+          <ReactionChart
+            :chart-data="chartData"
+            :summary-stats="summaryStats"
+          />
         </div>
       </div>
     </div>
@@ -245,6 +263,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 import QrCodeModal from '../components/modals/QrCodeModal.vue'
+import ReactionChart from '../components/ReactionChart.vue'
+import { useRealtimeAnalytics } from '../composables/useRealtimeAnalytics'
 
 const route = useRoute()
 const roomId = route.params.roomId
@@ -257,26 +277,29 @@ const room = ref(null)
 const updateLoading = ref(false)
 const updateSuccess = ref(false)
 
+// Analytics composable
+const { chartData, summaryStats, isLoading: analyticsLoading, error: analyticsError } = useRealtimeAnalytics(roomId)
+
 // Form data
 const roomForm = reactive({
   name: '',
   emojis: ['❤️', '🔥', '👏'],
   backgroundInput: '',
-  backgroundOutput: ''
+  backgroundOutput: '',
 })
 
 // Copy status tracking
 const copyStatus = reactive({
   input: false,
   output: false,
-  dashboard: false
+  dashboard: false,
 })
 
 // QR Modal state
 const qrModal = reactive({
   open: false,
   url: '',
-  filename: ''
+  filename: '',
 })
 
 // Computed URLs

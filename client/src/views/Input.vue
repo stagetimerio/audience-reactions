@@ -54,9 +54,12 @@
       <!-- Emoji Buttons -->
       <main class="flex-1 flex items-center justify-center p-6">
         <div class="w-full max-w-md">
-          <div v-if="roomData?.settings?.emojis?.length" class="grid grid-cols-2 gap-4 sm:grid-cols-3">
+          <div
+            v-if="emojis.length"
+            class="grid grid-cols-2 gap-4"
+          >
             <button
-              v-for="emojiConfig in roomData.settings.emojis"
+              v-for="emojiConfig in emojis"
               :key="emojiConfig.emoji"
               :class="[
                 'relative h-24 text-4xl bg-white rounded-xl shadow-md transition-colors',
@@ -148,6 +151,7 @@ const {
 const loading = ref(true)
 const error = ref(false)
 const roomData = ref(null)
+const emojis = computed(() => roomData.value?.settings?.emojis || [])
 
 // Computed property for background style
 const backgroundStyle = computed(() => {

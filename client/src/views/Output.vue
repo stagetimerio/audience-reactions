@@ -38,7 +38,7 @@
           </p>
 
           <!-- Demo emoji buttons -->
-          <div class="flex justify-center space-x-4 mb-6">
+          <div class="flex justify-center gap-4 mb-6">
             <button
               v-for="emoji in ['❤️', '🔥', '👏']"
               :key="emoji"
