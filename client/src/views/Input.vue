@@ -1,6 +1,6 @@
 <template>
   <div
-    class="min-h-screen flex flex-col touch-manipulation select-none relative"
+    class="h-svh flex flex-col touch-manipulation select-none relative"
     :style="backgroundStyle"
   >
     <!-- Loading State -->
@@ -63,7 +63,7 @@
               :key="emojiConfig.emoji"
               :class="[
                 'relative h-24 text-4xl bg-white rounded-xl shadow-md transition-colors',
-                'touch-manipulation hover:scale-105',
+                'touch-manipulation hover:scale-105 select-none',
                 'flex items-center justify-center',
                 getButtonState(emojiConfig.emoji).class
               ]"
@@ -125,7 +125,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useSpamProtection } from '../composables/useSpamProtection'
 import { useRoomApi } from '../composables/useRoomApi'
 
@@ -182,6 +182,22 @@ const backgroundStyle = computed(() => {
 })
 
 onMounted(async () => {
+  // Add classes to prevent zoom and scrolling on mobile
+  document.documentElement.classList.add('h-full', 'overflow-hidden', 'touch-manipulation')
+  document.body.classList.add('h-full', 'overflow-hidden', 'touch-manipulation', 'select-none')
+  const app = document.getElementById('app')
+  if (app) {
+    app.classList.add('h-full', 'overflow-hidden')
+  }
+
+  // Disable iOS bounce effect
+  document.documentElement.style.overscrollBehavior = 'none'
+  document.body.style.overscrollBehavior = 'none'
+
+  // Prevent iOS tap highlights
+  document.documentElement.style.webkitTapHighlightColor = 'transparent'
+
+  // Fetch room data
   try {
     roomData.value = await fetchRoom(props.roomId)
     loading.value = false
@@ -190,6 +206,21 @@ onMounted(async () => {
     error.value = true
     loading.value = false
   }
+})
+
+onBeforeUnmount(() => {
+  // Remove classes when leaving the component
+  document.documentElement.classList.remove('h-full', 'overflow-hidden', 'touch-manipulation')
+  document.body.classList.remove('h-full', 'overflow-hidden', 'touch-manipulation', 'select-none')
+  const app = document.getElementById('app')
+  if (app) {
+    app.classList.remove('h-full', 'overflow-hidden')
+  }
+
+  // Reset styles
+  document.documentElement.style.overscrollBehavior = ''
+  document.body.style.overscrollBehavior = ''
+  document.documentElement.style.webkitTapHighlightColor = ''
 })
 
 async function submitReaction (emoji) {
