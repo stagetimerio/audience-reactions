@@ -19,9 +19,12 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
 - **Signature Authentication**: HMAC-SHA256 secured dashboard access
 - **Room Management**: Update name, emojis (2-6), backgrounds via dashboard
 - **QR Code Generation**: Easy sharing with built-in QR codes
+- **Live Analytics**: Real-time stacked area chart with 30-minute rolling window ✅
+- **Analytics Dashboard**: Chart.js integration with emoji breakdown and totals ✅
+- **High-Frequency Data**: 20-second analytics batches for granular insights ✅
 
 ### 🔄 Next Phase
-- **Live Analytics**: Real-time reaction graphs and metrics on dashboard
+- **Advanced Analytics**: Historical data comparison and export functionality
 
 ## Backend Firebase Functions
 
@@ -69,13 +72,13 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
 ```
 
 #### 2. `batchAnalytics` (Scheduled Function)
-**Purpose**: Processes reactions into analytics data every minute
-- **Schedule**: Runs every minute (`* * * * *`)
+**Purpose**: Processes reactions into analytics data every 20 seconds
+- **Schedule**: Runs every minute with 3 executions (0s, 20s, 40s)
 - **Function**:
-  - Aggregates reactions from the last minute
+  - Aggregates reactions from the last 20 seconds
   - Creates analytics batches with emoji counts
   - Deletes processed reactions to prevent accumulation
-  - Enables real-time analytics without data buildup
+  - Enables high-frequency real-time analytics without data buildup
 
 #### 3. `cleanupOldData` (Scheduled Function)
 **Purpose**: Maintains database hygiene by removing old data

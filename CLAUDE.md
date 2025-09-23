@@ -48,8 +48,9 @@ cd functions && npm run build
 1. **Room Management**: Each session uses a unique `roomId` that creates an isolated reaction room
 2. **Reaction Submission**: Users click emoji buttons → HTTP POST to Firebase Functions → stored in Firestore
 3. **Real-time Display**: Frontend subscribes to Firestore `/rooms/{roomId}/reactions` → displays animated emojis on screen
-4. **Analytics Processing**: Scheduled function processes reactions every minute → creates analytics batches → deletes processed reactions
+4. **Analytics Processing**: Scheduled function processes reactions every 20 seconds → creates analytics batches → deletes processed reactions
 5. **Data Cleanup**: Daily cleanup removes old analytics (30 days) and inactive rooms (30 days)
+6. **Live Analytics**: Real-time dashboard displays 30-minute rolling window with 20-second granularity
 
 ### Key Files
 
@@ -63,9 +64,11 @@ cd functions && npm run build
 - `client/src/composables/useSpamProtection.js`: ✅ Spam protection with localStorage persistence
 - `client/src/composables/useRoomApi.js`: ✅ HTTP API integration
 - `client/src/composables/useRealtimeReactions.js`: ✅ Firebase real-time subscription
+- `client/src/composables/useRealtimeAnalytics.js`: ✅ Real-time analytics with 30-minute rolling window
 - `client/src/services/firebase.js`: ✅ Firebase SDK configuration
 - `client/src/config/firebase.js`: ✅ Static Firebase project configuration
 - `client/src/components/EmojiWall.vue`: ✅ Animated emoji display component
+- `client/src/components/ReactionChart.vue`: ✅ Chart.js stacked area chart for analytics
 - `client/src/plugins/fontawesome.js`: FontAwesome icon setup
 
 #### Backend (Firebase Functions)
@@ -99,6 +102,8 @@ cd functions && npm run build
 ### Features Implemented ✅
 - **Input Screen**: Mobile-first reaction interface with spam protection
 - **Output Screen**: Real-time animated emoji display with Firebase subscription
+- **Dashboard Screen**: Signature-protected room management with live analytics
+- **Live Analytics**: Real-time stacked area chart with 30-minute rolling window
 - **Spam Protection**: 10 clicks in 10 seconds → 5-second cooldown (persists through reloads)
 - **Visual Feedback**: Loading/success states for buttons, progress bar for cooldown
 - **Background Images**: Optional room background images (cover size for input screens)
@@ -107,6 +112,8 @@ cd functions && npm run build
 - **Real-time Display**: Firebase subscription with 50-emoji performance limit
 - **Mouse Help System**: One-time overlay with demo emojis and OBS/vMix integration guide
 - **Transparent Background**: Perfect for streaming overlays and projector displays
+- **Analytics Dashboard**: Chart.js integration with emoji breakdown and total counts
+- **High-Frequency Analytics**: 20-second batch intervals for granular data visualization
 
 ### Code Style
 - ESLint configured for single quotes, no semicolons, 2-space indentation, space inside curly braces
@@ -186,4 +193,4 @@ This type system ensures:
 ### Deployment
 - Firebase Functions deployed to `us-central1`
 - Firestore security rules allow public read, functions-only write
-- Scheduled functions: analytics (every minute), cleanup (daily 2 AM)
+- Scheduled functions: analytics (every 20 seconds), cleanup (daily 2 AM)
