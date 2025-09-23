@@ -78,8 +78,10 @@ cd functions && npm run build
 - `functions/src/utils/converters.ts`: Firestore document converters
 
 ### API Endpoints
-- `POST /rooms` - Create new room (supports optional backgroundImage URL)
+- `POST /rooms` - Create new room (returns dashboardUrl with signature)
 - `GET /rooms/{roomId}` - Get room info with emojis and settings
+- `PATCH /rooms/{roomId}?sig={signature}` - Update room settings (requires valid signature)
+- `GET /rooms/{roomId}/validate-signature?sig={signature}` - Validate dashboard signature
 - `POST /rooms/{roomId}/react` - Submit reaction (with 600ms backend rate limiting)
 - `GET /rooms/{roomId}/analytics` - Get analytics data
 
@@ -87,7 +89,7 @@ cd functions && npm run build
 - `/` - Landing page
 - `/room/{roomId}/input` - ✅ Mobile audience reaction interface
 - `/room/{roomId}/output` - ✅ Animated emoji display with real-time Firebase subscription
-- `/room/{roomId}/dashboard` - 🔄 Analytics and room management (planned)
+- `/room/{roomId}?sig={signature}` - ✅ Dashboard for room management (signature-protected)
 
 ### Environment Setup
 - Environment variables: `client/.env` with `PUBLIC_API_BASE_URL=https://api-vh67faopca-uc.a.run.app`

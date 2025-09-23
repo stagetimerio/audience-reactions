@@ -7,17 +7,21 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
 ### ✅ Completed Features
 - **Input Screen**: Mobile-first audience reaction interface (`/room/{roomId}/input`)
 - **Output Screen**: Real-time animated emoji display (`/room/{roomId}/output`)
+- **Dashboard Screen**: Secure room management interface (`/room/{roomId}?sig={signature}`)
 - **Spam Protection**: Intelligent cooldown system (10 clicks/10s → 5s cooldown)
 - **Visual Feedback**: Loading states, success animations, progress bars
-- **Background Images**: Optional custom room backgrounds (input screens)
+- **Background Images**: Optional custom room backgrounds (separate for input/output)
 - **Mobile Optimized**: Touch-friendly, large buttons, no zoom issues
 - **Firebase Backend**: Production-ready API with analytics processing
 - **Real-time Display**: Firebase subscription with performance optimization
 - **Mouse Help System**: One-time overlay with OBS/vMix integration guide
 - **Transparent Background**: Perfect for streaming overlays
+- **Signature Authentication**: HMAC-SHA256 secured dashboard access
+- **Room Management**: Update name, emojis (2-6), backgrounds via dashboard
+- **QR Code Generation**: Easy sharing with built-in QR codes
 
 ### 🔄 Next Phase
-- **Dashboard**: Room management and real-time analytics (`/room/{roomId}/dashboard`)
+- **Live Analytics**: Real-time reaction graphs and metrics on dashboard
 
 ## Backend Firebase Functions
 
@@ -30,9 +34,20 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
   ```bash
   curl -X POST "https://api-vh67faopca-uc.a.run.app/rooms" \
     -H "Content-Type: application/json" \
-    -d '{"name": "My Event", "backgroundImage": "https://example.com/bg.jpg"}'
+    -d '{"name": "My Event", "emojis": [{"emoji": "❤️"}, {"emoji": "🔥"}, {"emoji": "👏"}]}'
   ```
+  Returns `dashboardUrl` with signature for admin access.
+
 - **Get Room**: `GET /rooms/{roomId}` - Returns room config with emojis and settings
+
+- **Update Room**: `PATCH /rooms/{roomId}?sig={signature}`
+  ```bash
+  curl -X PATCH "https://api-vh67faopca-uc.a.run.app/rooms/{roomId}?sig={signature}" \
+    -H "Content-Type: application/json" \
+    -d '{"name": "Updated Name", "settings": {"emojis": [{"emoji": "😊"}, {"emoji": "😍"}]}}'
+  ```
+
+- **Validate Signature**: `GET /rooms/{roomId}/validate-signature?sig={signature}` - Validates dashboard access
 
 #### Reaction Submission
 - **Submit Reaction**: `POST /rooms/{roomId}/react`
