@@ -1,3 +1,12 @@
+```
+                      _   _
+  _ __ ___  __ _  ___| |_(_) ___  _ __  ___
+ | '__/ _ \/ _` |/ __| __| |/ _ \| '_ \/ __|
+ | | |  __/ (_| | (__| |_| | (_) | | | \__ \
+ |_|  \___|\__,_|\___|\__|_|\___/|_| |_|___/
+
+```
+
 # ❤️ Audience Reacts | by stagetimer.io
 
 A real-time emoji reaction system designed for large-scale live events (50k+ concurrent users). Audiences submit reactions via mobile devices, displayed on shared screens with real-time analytics.
