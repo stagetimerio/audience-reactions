@@ -8,16 +8,16 @@
     hide-footer
     @update:open="emit('update:open', $event)"
   >
-    <div class="max-w-[260px] mx-auto">
-      <QrcodeVue
-        ref="qrcanvas"
+    <div
+      ref="qrCanvasParent"
+      class="max-w-[260px] mx-auto"
+    >
+      <QrcodeCanvas
         class="!w-full !h-auto rounded"
         :value="props.url"
         :size="600"
         :margin="3"
-        render-as="canvas"
         level="L"
-        :style="{ width: '100%', height: '100%' }"
       />
     </div>
 
@@ -31,11 +31,11 @@
 
 <script setup>
 import Modal from './Modal.vue'
-import QrcodeVue from 'qrcode.vue'
+import { QrcodeCanvas } from 'qrcode.vue'
 import { faDownload } from '@fortawesome/free-solid-svg-icons'
 import { ref } from 'vue'
 
-const qrcanvas = ref()
+const qrCanvasParent = ref()
 const emit = defineEmits(['update:open'])
 const props = defineProps({
   open: Boolean,
@@ -43,8 +43,12 @@ const props = defineProps({
   filename: { type: String, default: 'audience-reacts-qr-code' },
 })
 
+/**
+ * Use the browser API to download a canvas via data-url.
+ * Note: A ref on the canvas itself points to an empty text for some reason.
+ */
 function download () {
-  const canvas = qrcanvas.value.$el
+  const canvas = qrCanvasParent.value.firstElementChild
   const link = document.createElement('a')
   link.download = `${props.filename}.png`
   link.href = canvas.toDataURL('image/png')
