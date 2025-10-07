@@ -11,6 +11,10 @@ export interface Room {
     }>
     backgroundInput?: string // Optional full URL or solid color for input view
     backgroundOutput?: string // Optional full URL or solid color for output view
+    tiltLimit?: {
+      maxReactions: number // Number of reactions before cooldown (default: 15)
+      cooldownSeconds: number // Cooldown duration in seconds (default: 10)
+    }
   }
   createdAt: Date
   updatedAt: Date

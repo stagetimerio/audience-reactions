@@ -115,6 +115,46 @@
               </div>
             </div>
 
+            <!-- Tilt Limit Settings -->
+            <div class="space-y-3 pt-3 border-t border-gray-200">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Spam Protection
+                </label>
+                <p class="text-xs text-gray-500 mb-3">
+                  Prevent spam by limiting how fast users can send reactions
+                </p>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Max Reactions
+                  </label>
+                  <input
+                    v-model.number="roomForm.tiltMaxReactions"
+                    type="number"
+                    min="1"
+                    max="100"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                  <p class="text-xs text-gray-500 mt-1">Reactions before cooldown</p>
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-600 mb-1">
+                    Cooldown (seconds)
+                  </label>
+                  <input
+                    v-model.number="roomForm.tiltCooldownSeconds"
+                    type="number"
+                    min="1"
+                    max="60"
+                    class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  >
+                  <p class="text-xs text-gray-500 mt-1">Wait time after limit</p>
+                </div>
+              </div>
+            </div>
+
             <!-- Submit Button -->
             <button
               type="submit"
@@ -286,6 +326,8 @@ const roomForm = reactive({
   emojis: ['❤️', '🔥', '👏'],
   backgroundInput: '',
   backgroundOutput: '',
+  tiltMaxReactions: 15,
+  tiltCooldownSeconds: 10,
 })
 
 // Copy status tracking
@@ -339,6 +381,8 @@ async function validateAndLoadRoom () {
     roomForm.emojis = roomData.settings?.emojis?.map((e) => e.emoji) || ['❤️', '🔥', '👏']
     roomForm.backgroundInput = roomData.settings?.backgroundInput || ''
     roomForm.backgroundOutput = roomData.settings?.backgroundOutput || ''
+    roomForm.tiltMaxReactions = roomData.settings?.tiltLimit?.maxReactions || 15
+    roomForm.tiltCooldownSeconds = roomData.settings?.tiltLimit?.cooldownSeconds || 10
   } catch (err) {
     error.value = 'Unable to load room data. Please check your connection and try again.'
     console.error('Dashboard load error:', err)
@@ -359,6 +403,10 @@ async function updateRoom () {
         emojis: roomForm.emojis.filter((e) => e.trim()).map((emoji) => ({ emoji })),
         backgroundInput: roomForm.backgroundInput || undefined,
         backgroundOutput: roomForm.backgroundOutput || undefined,
+        tiltLimit: {
+          maxReactions: roomForm.tiltMaxReactions,
+          cooldownSeconds: roomForm.tiltCooldownSeconds,
+        },
       },
     }
 

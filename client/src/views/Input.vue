@@ -138,6 +138,19 @@ const props = defineProps({
 })
 
 const { fetchRoom, submitReaction: apiSubmitReaction } = useRoomApi()
+
+const loading = ref(true)
+const error = ref(false)
+const roomData = ref(null)
+const emojis = computed(() => roomData.value?.settings?.emojis || [])
+let refreshInterval = null
+
+// Get tilt limit settings from room or use defaults
+const tiltSettings = computed(() => ({
+  maxReactions: roomData.value?.settings?.tiltLimit?.maxReactions || 15,
+  cooldownSeconds: roomData.value?.settings?.tiltLimit?.cooldownSeconds || 10,
+}))
+
 const {
   canSubmit,
   cooldownRemaining,
@@ -147,12 +160,7 @@ const {
   setButtonLoading,
   setButtonSuccess,
   clearButtonState,
-} = useSpamProtection(props.roomId)
-
-const loading = ref(true)
-const error = ref(false)
-const roomData = ref(null)
-const emojis = computed(() => roomData.value?.settings?.emojis || [])
+} = useSpamProtection(props.roomId, tiltSettings)
 
 // Computed property for background style
 const backgroundStyle = computed(() => {
@@ -182,23 +190,40 @@ const backgroundStyle = computed(() => {
   }
 })
 
-onMounted(async () => {
-  // Add classes to prevent zoom and scrolling on mobile
-  document.body.classList.add('h-svh', 'overflow-hidden', 'touch-manipulation')
-
-  // Fetch room data
+// Fetch room data (initial load and periodic refresh)
+async function loadRoomData () {
   try {
     roomData.value = await fetchRoom(props.roomId)
     loading.value = false
   } catch (err) {
     console.error('Failed to fetch room:', err)
-    error.value = true
-    loading.value = false
+    // Only show error on initial load
+    if (!roomData.value) {
+      error.value = true
+      loading.value = false
+    }
   }
+}
+
+onMounted(async () => {
+  // Add classes to prevent zoom and scrolling on mobile
+  document.body.classList.add('h-svh', 'overflow-hidden', 'touch-manipulation')
+
+  // Initial fetch
+  await loadRoomData()
+
+  // Set up periodic refresh every 30 seconds
+  refreshInterval = setInterval(loadRoomData, 30000)
 })
 
 onBeforeUnmount(() => {
   document.body.classList.remove('h-svh', 'overflow-hidden', 'touch-manipulation')
+
+  // Clear refresh interval
+  if (refreshInterval) {
+    clearInterval(refreshInterval)
+    refreshInterval = null
+  }
 })
 
 async function submitReaction (emoji) {

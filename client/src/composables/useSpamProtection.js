@@ -1,14 +1,22 @@
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, unref } from 'vue'
 
-const SPAM_THRESHOLD = 15 // clicks
 const SPAM_WINDOW = 10000 // 10 seconds in ms
-const COOLDOWN_DURATION = 10000 // 5 seconds in ms
 
-export function useSpamProtection (roomId) {
+export function useSpamProtection (roomId, settings = {}) {
   const clicks = ref([])
   const cooldownUntil = ref(0)
   const buttonStates = ref({}) // emoji -> { lastClick, state, clickCount, pendingRequests }
   const forceUpdate = ref(0) // Used to force reactivity updates
+
+  // Get settings from room config or use defaults (supports reactive settings)
+  const SPAM_THRESHOLD = computed(() => {
+    const s = unref(settings)
+    return s.maxReactions || 15
+  })
+  const COOLDOWN_DURATION = computed(() => {
+    const s = unref(settings)
+    return (s.cooldownSeconds || 10) * 1000 // Convert to ms
+  })
 
   const storageKey = `spam_protection_${roomId}`
 
@@ -104,7 +112,7 @@ export function useSpamProtection (roomId) {
   const cooldownProgress = computed(() => {
     const remaining = cooldownRemaining.value
     if (remaining === 0) return 0
-    const total = COOLDOWN_DURATION
+    const total = COOLDOWN_DURATION.value
     return Math.round((remaining / total) * 100)
   })
 
@@ -119,8 +127,8 @@ export function useSpamProtection (roomId) {
     clicks.value.push(now)
 
     // Check for spam
-    if (clicks.value.length >= SPAM_THRESHOLD) {
-      cooldownUntil.value = now + COOLDOWN_DURATION
+    if (clicks.value.length >= SPAM_THRESHOLD.value) {
+      cooldownUntil.value = now + COOLDOWN_DURATION.value
       clicks.value = [] // Clear clicks after triggering cooldown
       startUpdateTimer() // Start the countdown timer
     }
