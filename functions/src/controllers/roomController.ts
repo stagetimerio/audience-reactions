@@ -78,7 +78,7 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   if (!from || !to) {
     res.status(400).json({
       error: 'Both time range parameters are required',
-      message: 'Please provide ISO string timestamps for both from/to (or startTime/endTime) parameters'
+      message: 'Please provide ISO string timestamps for both from/to (or startTime/endTime) parameters',
     })
     return
   }
@@ -90,7 +90,7 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
     res.status(400).json({
       error: 'Invalid date format',
-      message: 'Both "from" and "to" must be valid ISO string timestamps'
+      message: 'Both "from" and "to" must be valid ISO string timestamps',
     })
     return
   }
@@ -98,7 +98,7 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   if (fromDate >= toDate) {
     res.status(400).json({
       error: 'Invalid time range',
-      message: '"from" must be earlier than "to"'
+      message: '"from" must be earlier than "to"',
     })
     return
   }
