@@ -64,7 +64,9 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
  */
 export async function getAnalytics(req: Request, res: Response): Promise<void> {
   const { roomId } = req.params
-  const { from, to } = req.query
+  // Support both old (startTime/endTime) and new (from/to) parameter names
+  const from = (req.query.from || req.query.startTime) as string | undefined
+  const to = (req.query.to || req.query.endTime) as string | undefined
 
   // Validate room ID
   if (!roomId) {
@@ -75,15 +77,15 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   // Enforce required query parameters
   if (!from || !to) {
     res.status(400).json({
-      error: 'Both "from" and "to" query parameters are required',
-      message: 'Please provide ISO string timestamps for both from and to parameters'
+      error: 'Both time range parameters are required',
+      message: 'Please provide ISO string timestamps for both from/to (or startTime/endTime) parameters'
     })
     return
   }
 
   // Validate ISO string format
-  const fromDate = new Date(from as string)
-  const toDate = new Date(to as string)
+  const fromDate = new Date(from)
+  const toDate = new Date(to)
 
   if (isNaN(fromDate.getTime()) || isNaN(toDate.getTime())) {
     res.status(400).json({
@@ -112,23 +114,50 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
 
   try {
     const BATCH_INTERVAL_MS = 20 * 1000 // 20 seconds in milliseconds
+    const PAGE_SIZE = 100 // Fetch analytics in batches of 100
 
     // Add 20-second buffer to the beginning and end to ensure complete coverage
     const queryFromDate = new Date(fromDate.getTime() - BATCH_INTERVAL_MS)
     const queryToDate = new Date(toDate.getTime() + BATCH_INTERVAL_MS)
 
-    // Build analytics query
-    // Since analyticsBatches only have endTime, we query for endTime >= queryFrom and endTime <= queryTo
-    // This ensures we get all batches that might overlap with our time window
-    const query: Query = roomRef.collection('analytics')
-      .where('endTime', '>=', Timestamp.fromDate(queryFromDate))
-      .where('endTime', '<=', Timestamp.fromDate(queryToDate))
-      .orderBy('endTime', 'asc')
+    // Fetch analytics in batches until we have all documents
+    const analyticsData: AnalyticsBatch[] = []
+    let lastDoc: DocumentSnapshot | null = null
+    let hasMore = true
 
-    const analyticsSnapshot = await query.get()
+    while (hasMore) {
+      // Build analytics query with pagination
+      let query: Query = roomRef.collection('analytics')
+        .where('endTime', '>=', Timestamp.fromDate(queryFromDate))
+        .where('endTime', '<=', Timestamp.fromDate(queryToDate))
+        .orderBy('endTime', 'asc')
+        .limit(PAGE_SIZE)
 
-    // Format analytics data using converters
-    const analyticsData = analyticsSnapshot.docs.map((doc: DocumentSnapshot) => analyticsBatchFromSnapshot(doc))
+      // Continue from last document if pagination is in progress
+      if (lastDoc) {
+        query = query.startAfter(lastDoc)
+      }
+
+      const analyticsSnapshot = await query.get()
+
+      // If no documents returned, we're done
+      if (analyticsSnapshot.empty) {
+        hasMore = false
+        break
+      }
+
+      // Format analytics data using converters
+      const batchData = analyticsSnapshot.docs.map((doc: DocumentSnapshot) => analyticsBatchFromSnapshot(doc))
+      analyticsData.push(...batchData)
+
+      // Check if we got fewer documents than the page size (last page)
+      if (analyticsSnapshot.docs.length < PAGE_SIZE) {
+        hasMore = false
+      } else {
+        // Set lastDoc for next iteration
+        lastDoc = analyticsSnapshot.docs[analyticsSnapshot.docs.length - 1]
+      }
+    }
 
     // Calculate summary statistics
     const summary = {
