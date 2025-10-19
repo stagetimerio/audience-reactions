@@ -73,8 +73,8 @@ async function processBatch() {
       totalWindows += Object.keys(windows).length
     }
 
-    logger.info(`Processing ${totalRooms} rooms with ${totalWindows} time windows ` +
-      `and ${allReactions.size} total reactions`)
+    logger.info(`Processing ${totalRooms} rooms with ${totalWindows} time windows `
+      + `and ${allReactions.size} total reactions`)
 
     // Create analytics batches for each room/window combination
     const batch = db.batch()
@@ -123,8 +123,8 @@ async function processBatch() {
     // Commit all changes in a single batch
     await batch.commit()
 
-    logger.info(`Analytics batching completed: processed ${allReactions.size} reactions ` +
-      `from ${totalRooms} rooms into ${totalWindows} time windows`)
+    logger.info(`Analytics batching completed: processed ${allReactions.size} reactions `
+      + `from ${totalRooms} rooms into ${totalWindows} time windows`)
   } catch (error) {
     // Check if error is due to missing index
     const err = error as any

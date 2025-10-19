@@ -52,6 +52,12 @@ export default [
 
       // TypeScript specific overrides
       '@typescript-eslint/no-explicit-any': 'off',
+      'no-unused-vars': 'off', // Disable base rule
+      '@typescript-eslint/no-unused-vars': ['error', {
+        'argsIgnorePattern': '^_',
+        'varsIgnorePattern': '^_',
+        'caughtErrorsIgnorePattern': '^_',
+      }],
 
       // Google style guide inspired rules
       'camelcase': 'off', // Disabled because TypeScript handles this

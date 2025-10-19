@@ -4,7 +4,7 @@ import { getFirestore } from 'firebase-admin/firestore'
 // Initialize Firebase Admin SDK once
 try {
   initializeApp()
-} catch (error) {
+} catch (_error) {
   // App already initialized, continue with existing instance
 }
 
