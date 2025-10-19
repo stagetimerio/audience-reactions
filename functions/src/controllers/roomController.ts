@@ -113,10 +113,10 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
   }
 
   try {
-    const BATCH_INTERVAL_MS = 20 * 1000 // 20 seconds in milliseconds
+    const BATCH_INTERVAL_MS = 30 * 1000 // 30 seconds in milliseconds
     const PAGE_SIZE = 100 // Fetch analytics in batches of 100
 
-    // Add 20-second buffer to the beginning and end to ensure complete coverage
+    // Add 30-second buffer to the beginning and end to ensure complete coverage
     const queryFromDate = new Date(fromDate.getTime() - BATCH_INTERVAL_MS)
     const queryToDate = new Date(toDate.getTime() + BATCH_INTERVAL_MS)
 

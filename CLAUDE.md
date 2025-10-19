@@ -48,9 +48,9 @@ cd functions && npm run build
 1. **Room Management**: Each session uses a unique `roomId` that creates an isolated reaction room
 2. **Reaction Submission**: Users click emoji buttons → HTTP POST to Firebase Functions → stored in Firestore
 3. **Real-time Display**: Frontend subscribes to Firestore `/rooms/{roomId}/reactions` → displays animated emojis on screen
-4. **Analytics Processing**: Scheduled function processes reactions every 20 seconds → creates analytics batches → deletes processed reactions
+4. **Analytics Processing**: Scheduled function processes reactions every minute → creates 30-second analytics batches → deletes processed reactions
 5. **Data Cleanup**: Daily cleanup removes old analytics (30 days) and inactive rooms (30 days)
-6. **Live Analytics**: Real-time dashboard displays 30-minute rolling window with 20-second granularity
+6. **Live Analytics**: Real-time dashboard displays 30-minute rolling window with 30-second granularity
 
 ### Key Files
 
@@ -113,7 +113,7 @@ cd functions && npm run build
 - **Mouse Help System**: One-time overlay with demo emojis and OBS/vMix integration guide
 - **Transparent Background**: Perfect for streaming overlays and projector displays
 - **Analytics Dashboard**: Chart.js integration with emoji breakdown and total counts
-- **High-Frequency Analytics**: 20-second batch intervals for granular data visualization
+- **High-Frequency Analytics**: 30-second batch intervals for granular data visualization
 
 ### Code Style
 - **ESLint**: Each subdirectory (`client/`, `functions/`) has independent ESLint configuration
@@ -196,4 +196,4 @@ This type system ensures:
 ### Deployment
 - Firebase Functions deployed to `us-central1`
 - Firestore security rules allow public read, functions-only write
-- Scheduled functions: analytics (every 20 seconds), cleanup (daily 2 AM)
+- Scheduled functions: analytics (every minute), cleanup (daily 2 AM)
