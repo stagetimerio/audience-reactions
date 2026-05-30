@@ -11,12 +11,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Node.js
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
-          node-version: 22
+          node-version: 24
           cache: 'npm'
           cache-dependency-path: functions/package-lock.json
 
@@ -27,7 +27,7 @@ jobs:
         run: npm run build --prefix functions
 
       - name: Deploy to Firebase
-        uses: w9jds/firebase-action@v14.17.0
+        uses: w9jds/firebase-action@v15.19.0
         with:
           args: deploy --only functions --force
         env:
