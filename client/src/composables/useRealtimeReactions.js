@@ -11,6 +11,8 @@ export function useRealtimeReactions (roomId) {
   let unsubscribe = null
   let reactionCounter = 0
   const maxReactions = 50 // Performance limit
+  const MAX_AGE_MS = 5000
+  let newest = null
 
   // Create emoji objects for the EmojiWall component
   function createReactionEmote (reactionDoc) {
@@ -48,28 +50,26 @@ export function useRealtimeReactions (roomId) {
           connected.value = true
           error.value = null
 
-          const now = Date.now()
+          const added = snapshot.docChanges().filter((change) => change.type === 'added')
+          const times = added.map((change) => change.doc.data().timestamp?.toMillis?.() ?? 0)
 
-          // Process new reactions (only additions, not full reset)
-          snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-              const data = change.doc.data()
-              const reactionTime = data.timestamp?.toDate?.()?.getTime() || data.timestamp?.getTime() || 0
+          // Server timestamps only: the output machine's clock can be off by seconds
+          if (newest === null) {
+            if (!snapshot.metadata.fromCache) newest = Math.max(0, ...times)
+            return
+          }
+          newest = Math.max(newest, ...times)
 
-              // Ignore reactions older than 5 seconds
-              if (now - reactionTime > 5000) {
-                console.log('[reactions] Ignoring old reaction:', now - reactionTime, 'ms old')
-                return
-              }
+          added.forEach((change, i) => {
+            if (times[i] < newest - MAX_AGE_MS) return
 
-              // Add random delay (0-120ms) for natural timing
-              const delay = Math.random() * 120
-              setTimeout(() => {
-                const emote = createReactionEmote(change.doc)
-                reactions.value.push(emote)
-                maintainReactionLimit()
-              }, delay)
-            }
+            // Add random delay (0-120ms) for natural timing
+            const delay = Math.random() * 120
+            setTimeout(() => {
+              const emote = createReactionEmote(change.doc)
+              reactions.value.push(emote)
+              maintainReactionLimit()
+            }, delay)
           })
         },
         (err) => {

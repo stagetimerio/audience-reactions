@@ -67,7 +67,7 @@
               rel="noopener"
               class="underline hover:text-black"
             >
-              vMix
+              OBS
             </a>
             <a
               href="https://stagetimer.io/docs/integration-with-vmix/"
