@@ -33,7 +33,7 @@ export function handleErrors(
  * Expects signature in query parameter 'sig'
  */
 export function validateRoomSignature(
-  req: Request,
+  req: Request<{ roomId: string }>,
   res: Response,
   next: NextFunction
 ): void {

@@ -62,7 +62,7 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
 /**
  * Get analytics data for a room between two timestamps
  */
-export async function getAnalytics(req: Request, res: Response): Promise<void> {
+export async function getAnalytics(req: Request<{ roomId: string }>, res: Response): Promise<void> {
   const { roomId } = req.params
   // Support both old (startTime/endTime) and new (from/to) parameter names
   const from = (req.query.from || req.query.startTime) as string | undefined
@@ -190,7 +190,7 @@ export async function getAnalytics(req: Request, res: Response): Promise<void> {
 /**
  * Get room information
  */
-export async function getRoom(req: Request, res: Response): Promise<void> {
+export async function getRoom(req: Request<{ roomId: string }>, res: Response): Promise<void> {
   const { roomId } = req.params
 
   // Validate room ID
@@ -224,7 +224,7 @@ export async function getRoom(req: Request, res: Response): Promise<void> {
 /**
  * Validate a signature for a room
  */
-export function validateSignature(req: Request, res: Response): void {
+export function validateSignature(req: Request<{ roomId: string }>, res: Response): void {
   const { roomId } = req.params
   const signature = req.query.sig as string
 
@@ -253,7 +253,7 @@ export function validateSignature(req: Request, res: Response): void {
 /**
  * Update room settings (requires valid signature)
  */
-export async function updateRoom(req: Request, res: Response): Promise<void> {
+export async function updateRoom(req: Request<{ roomId: string }>, res: Response): Promise<void> {
   const { roomId } = req.params
   const { name, settings } = req.body
 

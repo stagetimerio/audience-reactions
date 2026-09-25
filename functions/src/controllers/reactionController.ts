@@ -8,7 +8,7 @@ import { roomFromSnapshot } from '../utils/converters'
 /**
  * Submit a reaction to a room
  */
-export async function submitReaction(req: Request, res: Response): Promise<void> {
+export async function submitReaction(req: Request<{ roomId: string }>, res: Response): Promise<void> {
   const { roomId } = req.params
   const { emoji } = req.body
 

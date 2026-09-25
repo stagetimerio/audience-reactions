@@ -1,5 +1,5 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler'
-import { Timestamp, DocumentReference } from 'firebase-admin/firestore'
+import { Timestamp, DocumentReference, FieldValue } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { Reaction } from '../types'
@@ -16,7 +16,7 @@ function getWindowEndTime(timestamp: Date): Date {
 }
 
 /**
- * Core analytics batching logic - idempotent version
+ * Core analytics batching logic
  * Processes ALL unprocessed reactions, grouping into 30-second fixed windows
  */
 async function processBatch() {
@@ -102,11 +102,14 @@ async function processBatch() {
             .collection('analytics')
             .doc(windowKey)
 
+          // A window can span two runs. Add to its counts, do not replace them.
+          const increments: Record<string, FieldValue> = {}
+          for (const [emoji, count] of Object.entries(counts)) increments[emoji] = FieldValue.increment(count)
           batch.set(analyticsRef, {
             endTime: Timestamp.fromDate(windowEndTime),
-            counts,
-            total,
-          }, { merge: true }) // Use merge in case we reprocess the same window
+            counts: increments,
+            total: FieldValue.increment(total),
+          }, { merge: true })
 
           logger.info(`Queued analytics for room ${roomId} window ${windowKey}: ${total} reactions`)
         } catch (error) {
@@ -141,7 +144,6 @@ async function processBatch() {
 /**
  * Scheduled function that runs every minute
  * Processes all unprocessed reactions into 30-second time windows
- * Idempotent - can safely run multiple times without duplicating data
  */
 export const batchAnalytics = onSchedule(
   {
