@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { DocumentSnapshot, Query, Timestamp } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
-import { merge } from 'lodash'
 import { db } from '../firebase-setup'
 import { AnalyticsBatch, DEFAULT_EMOJIS } from '../types'
 import { roomFromSnapshot, analyticsBatchFromSnapshot } from '../utils/converters'
@@ -291,31 +290,12 @@ export async function updateRoom(req: Request<{ roomId: string }>, res: Response
       )
     }
 
-    // Clean up null/undefined backgrounds
-    if (settings) {
-      if (settings.backgroundInput === null || settings.backgroundInput === '') {
-        delete settings.backgroundInput
-      }
-      if (settings.backgroundOutput === null || settings.backgroundOutput === '') {
-        delete settings.backgroundOutput
-      }
-    }
+    // Each given setting replaces the stored one. null or '' removes a background.
+    const newSettings = { ...currentRoom.settings, ...settings }
+    if (!newSettings.backgroundInput) delete newSettings.backgroundInput
+    if (!newSettings.backgroundOutput) delete newSettings.backgroundOutput
 
-    // Merge updates with existing data
-    const updateData = merge(
-      {},
-      { name: currentRoom.name, settings: currentRoom.settings },
-      { ...(name && { name }), ...(settings && { settings }) }
-    )
-
-    // Check if there are actual changes
-    if (JSON.stringify(updateData) === JSON.stringify({ name: currentRoom.name, settings: currentRoom.settings })) {
-      res.status(400).json({ error: 'No changes detected' })
-      return
-    }
-
-    // Perform update
-    await roomRef.update(updateData)
+    await roomRef.update({ name: name || currentRoom.name, settings: newSettings })
 
     // Get updated room data
     const updatedRoomDoc = await roomRef.get()

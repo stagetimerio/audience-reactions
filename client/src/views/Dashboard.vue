@@ -404,8 +404,8 @@ async function updateRoom () {
       name: roomForm.name,
       settings: {
         emojis: roomForm.emojis.filter((e) => e.trim()).map((emoji) => ({ emoji })),
-        backgroundInput: roomForm.backgroundInput || undefined,
-        backgroundOutput: roomForm.backgroundOutput || undefined,
+        backgroundInput: roomForm.backgroundInput || null,
+        backgroundOutput: roomForm.backgroundOutput || null,
         tiltLimit: {
           maxReactions: roomForm.tiltMaxReactions,
           cooldownSeconds: roomForm.tiltCooldownSeconds,
@@ -424,7 +424,7 @@ async function updateRoom () {
 
     if (!response.ok) {
       const errorData = await response.json()
-      throw new Error(errorData.message || 'Update failed')
+      throw new Error(errorData.message || errorData.error || `HTTP ${response.status}`)
     }
 
     updateSuccess.value = true
