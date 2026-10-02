@@ -27,6 +27,3 @@ export const api = onRequest(
 
 // Export analytics functions
 export { batchAnalytics } from './schedules/analytics'
-
-// Export cleanup functions
-export { cleanupOldData } from './schedules/cleanup'

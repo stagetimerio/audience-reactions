@@ -89,14 +89,14 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
   - Deletes processed reactions to prevent accumulation
   - Enables high-frequency real-time analytics without data buildup
 
-#### 3. `cleanupOldData` (Scheduled Function)
-**Purpose**: Maintains database hygiene by removing old data
-- **Schedule**: Daily at 2 AM Europe/Berlin (`0 2 * * *`)
-- **Function**:
-  - Removes analytics data older than 30 days
-  - Deletes inactive rooms after 7 days of no activity
-  - Cleans up orphaned reactions (safety measure)
-  - Prevents database from growing indefinitely
+#### Data expiry (Firestore TTL)
+Rooms, analytics and reactions have an `expiresAt` field. Firestore TTL deletes a doc after that
+time. The policies are in `firestore.indexes.json`. TTL does not delete subcollections, so each
+collection has its own `expiresAt` (`functions/src/utils/expiry.ts`):
+- Rooms: **never expire.** `expiresAt: null`, and there is no TTL policy for rooms.
+  `batchAnalytics` sets `lastUsedAt` on the room when it processes its reactions
+- Analytics: 30 days after the window end
+- Reactions: 1 hour (a safety net — `batchAnalytics` deletes them first)
 
 #### 4. `processAnalyticsRange` (Manual Function)
 **Purpose**: Backup function for manual analytics processing
@@ -142,7 +142,7 @@ A real-time emoji reaction system designed for large-scale live events (50k+ con
   createdAt: Timestamp      // Batch creation time
 }
 ```
-**Lifecycle**: Created by `batchAnalytics` → Read by Dashboard → Deleted by `cleanupOldData` after 30 days
+**Lifecycle**: Created by `batchAnalytics` → Read by Dashboard → Deleted by Firestore TTL (`expiresAt`) after 30 days
 
 ## Security Rules
 

@@ -42,7 +42,7 @@ export async function createRoom(req: Request, res: Response): Promise<void> {
     roomData.settings.backgroundOutput = backgroundOutput
   }
 
-  await roomRef.set(roomData)
+  await roomRef.set({ ...roomData, expiresAt: null })
 
   logger.info(`Created new room: ${roomId}`)
 

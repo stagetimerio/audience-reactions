@@ -16,6 +16,8 @@ export interface Room {
       cooldownSeconds: number // Cooldown duration in seconds (default: 10)
     }
   }
+  lastUsedAt: Date | null // Set by batchAnalytics. null: no reactions since 2026-10
+  expiresAt: Date | null // null: the room never expires
   createdAt: Date
   updatedAt: Date
 }
@@ -25,6 +27,7 @@ export interface Reaction {
   emoji: string
   roomId: string
   timestamp: Date
+  expiresAt: Date
   createdAt: Date
   updatedAt: Date
 }
@@ -34,6 +37,7 @@ export interface AnalyticsBatch {
   endTime: Date
   counts: Record<string, number>
   total: number
+  expiresAt: Date
   createdAt: Date
   updatedAt: Date
 }

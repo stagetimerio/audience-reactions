@@ -51,7 +51,9 @@ export function fromSnapshot<TFirestore, TEntity>(
  * Convert Room document from Firestore
  */
 export function roomFromSnapshot(snapshot: DocumentSnapshot): Room {
-  return fromSnapshot<RoomFirestore, Room>(snapshot)
+  return fromSnapshot<RoomFirestore, Room>(snapshot, {
+    dateFields: ['lastUsedAt', 'expiresAt'],
+  })
 }
 
 /**
@@ -59,7 +61,7 @@ export function roomFromSnapshot(snapshot: DocumentSnapshot): Room {
  */
 export function reactionFromSnapshot(snapshot: DocumentSnapshot): Reaction {
   return fromSnapshot<ReactionFirestore, Reaction>(snapshot, {
-    dateFields: ['timestamp'],
+    dateFields: ['timestamp', 'expiresAt'],
   })
 }
 
@@ -68,6 +70,6 @@ export function reactionFromSnapshot(snapshot: DocumentSnapshot): Reaction {
  */
 export function analyticsBatchFromSnapshot(snapshot: DocumentSnapshot): AnalyticsBatch {
   return fromSnapshot<AnalyticsBatchFirestore, AnalyticsBatch>(snapshot, {
-    dateFields: ['endTime'],
+    dateFields: ['endTime', 'expiresAt'],
   })
 }

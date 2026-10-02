@@ -4,6 +4,7 @@ import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { DEFAULT_EMOJIS } from '../types'
 import { roomFromSnapshot } from '../utils/converters'
+import { expiresAt, REACTION_TTL_MS } from '../utils/expiry'
 
 /**
  * Submit a reaction to a room
@@ -36,6 +37,7 @@ export async function submitReaction(req: Request<{ roomId: string }>, res: Resp
       settings: {
         emojis: DEFAULT_EMOJIS,
       },
+      expiresAt: null,
     })
     logger.info(`Created new room: ${roomId}`)
 
@@ -67,6 +69,7 @@ export async function submitReaction(req: Request<{ roomId: string }>, res: Resp
     emoji,
     roomId,
     timestamp: FieldValue.serverTimestamp(),
+    expiresAt: expiresAt(REACTION_TTL_MS),
   })
 
   logger.info(`Reaction added: ${emoji} in room ${roomId}`)

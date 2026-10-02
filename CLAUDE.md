@@ -49,7 +49,7 @@ cd functions && npm run build
 2. **Reaction Submission**: Users click emoji buttons → HTTP POST to Firebase Functions → stored in Firestore
 3. **Real-time Display**: Frontend subscribes to Firestore `/rooms/{roomId}/reactions` → displays animated emojis on screen
 4. **Analytics Processing**: Scheduled function processes reactions every minute → creates 10-second analytics batches → deletes processed reactions
-5. **Data Cleanup**: Daily cleanup removes old analytics (30 days) and inactive rooms (30 days)
+5. **Data Expiry**: Firestore TTL on `expiresAt` deletes analytics (30 days) and reactions (1 hour). Rooms never expire (`expiresAt: null`). `batchAnalytics` sets the room's `lastUsedAt`
 6. **Live Analytics**: Real-time dashboard displays 30-minute rolling window with 10-second granularity
 
 ### Key Files
@@ -76,7 +76,7 @@ cd functions && npm run build
 - `functions/src/controllers/reactionController.ts`: Reaction submission logic
 - `functions/src/controllers/roomController.ts`: Room management and analytics
 - `functions/src/schedules/analytics.ts`: Scheduled analytics processing
-- `functions/src/schedules/cleanup.ts`: Scheduled data cleanup
+- `functions/src/utils/expiry.ts`: `expiresAt` values for Firestore TTL
 - `functions/src/types/index.ts`: TypeScript interfaces and types
 - `functions/src/utils/converters.ts`: Firestore document converters
 
@@ -196,4 +196,5 @@ This type system ensures:
 ### Deployment
 - Firebase Functions deployed to `us-central1`
 - Firestore security rules allow public read, functions-only write
-- Scheduled functions: analytics (every minute), cleanup (daily 2 AM)
+- Scheduled function: analytics (every minute)
+- Firestore TTL policies on `expiresAt` (`firestore.indexes.json`)

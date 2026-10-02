@@ -3,6 +3,7 @@ import { Timestamp, DocumentReference, FieldValue } from 'firebase-admin/firesto
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { Reaction } from '../types'
+import { expiresAt, ANALYTICS_TTL_MS } from '../utils/expiry'
 
 /**
  * Rounds a timestamp UP to the next 10-second boundary
@@ -80,6 +81,8 @@ async function processBatch() {
     const batch = db.batch()
 
     for (const [roomId, windows] of Object.entries(roomWindowGroups)) {
+      batch.set(db.collection('rooms').doc(roomId), { lastUsedAt: FieldValue.serverTimestamp() }, { merge: true })
+
       for (const [windowKey, reactions] of Object.entries(windows)) {
         try {
           // Count reactions by emoji type
@@ -109,6 +112,7 @@ async function processBatch() {
             endTime: Timestamp.fromDate(windowEndTime),
             counts: increments,
             total: FieldValue.increment(total),
+            expiresAt: expiresAt(ANALYTICS_TTL_MS, windowEndTime.getTime()),
           }, { merge: true })
 
           logger.info(`Queued analytics for room ${roomId} window ${windowKey}: ${total} reactions`)
