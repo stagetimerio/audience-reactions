@@ -93,7 +93,7 @@
             <div class="space-y-3">
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">
-                  Input Background (URL or color)
+                  Audience Background (URL or color)
                 </label>
                 <input
                   v-model="roomForm.backgroundInput"
@@ -182,7 +182,7 @@
           <div class="space-y-6">
             <!-- Input Screen -->
             <div>
-              <h3 class="font-medium text-gray-900 mb-2">Audience Reaction Page</h3>
+              <h3 class="font-medium text-gray-900 mb-2">Audience Page</h3>
               <p class="text-sm text-gray-600 mb-3">
                 Share this link with your audience to let them send reactions
               </p>
@@ -207,9 +207,9 @@
               </div>
             </div>
 
-            <!-- Output Screen -->
+            <!-- Output Page -->
             <div>
-              <h3 class="font-medium text-gray-900 mb-2">Display Output Screen</h3>
+              <h3 class="font-medium text-gray-900 mb-2">Output Page</h3>
               <p class="text-sm text-gray-600 mb-3">
                 Use this screen for displays, projectors, or as OBS/vMix overlay
               </p>
