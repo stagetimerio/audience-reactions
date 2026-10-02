@@ -25,6 +25,10 @@ const props = defineProps({
 function tilt (id) {
   let hash = 2166136261
   for (const c of String(id)) hash = Math.imul(hash ^ c.codePointAt(0), 16777619)
+  // Sequential ids differ only in the last character. This mix spreads that change to all bits.
+  hash = Math.imul(hash ^ (hash >>> 16), 0x85ebca6b)
+  hash = Math.imul(hash ^ (hash >>> 13), 0xc2b2ae35)
+  hash ^= hash >>> 16
   return ((hash >>> 0) / 4294967296) * 50 - 25
 }
 </script>
