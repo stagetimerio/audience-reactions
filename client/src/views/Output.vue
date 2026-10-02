@@ -90,7 +90,7 @@
     </Transition>
 
     <!-- Emoji Wall -->
-    <EmojiWall :emotes="reactions" />
+    <EmojiWall :emotes="reactions" :playful="roomData?.settings?.playful" />
 
     <!-- Connection Status (subtle indicator) -->
     <div

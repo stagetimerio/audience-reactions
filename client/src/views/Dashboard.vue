@@ -113,6 +113,14 @@
                   placeholder="https://example.com/image.jpg or transparent"
                 >
               </div>
+              <label class="flex items-center gap-2 text-sm text-gray-700">
+                <input
+                  v-model="roomForm.playful"
+                  type="checkbox"
+                  class="rounded border-gray-300"
+                >
+                Playful output: emojis tilt and grow as they rise
+              </label>
             </div>
 
             <!-- Tilt Limit Settings -->
@@ -329,6 +337,7 @@ const roomForm = reactive({
   emojis: ['❤️', '🔥', '👏'],
   backgroundInput: '',
   backgroundOutput: '',
+  playful: false,
   tiltMaxReactions: 15,
   tiltCooldownSeconds: 10,
 })
@@ -384,6 +393,7 @@ async function validateAndLoadRoom () {
     roomForm.emojis = roomData.settings?.emojis?.map((e) => e.emoji) || ['❤️', '🔥', '👏']
     roomForm.backgroundInput = roomData.settings?.backgroundInput || ''
     roomForm.backgroundOutput = roomData.settings?.backgroundOutput || ''
+    roomForm.playful = roomData.settings?.playful || false
     roomForm.tiltMaxReactions = roomData.settings?.tiltLimit?.maxReactions || 15
     roomForm.tiltCooldownSeconds = roomData.settings?.tiltLimit?.cooldownSeconds || 10
   } catch (err) {
@@ -406,6 +416,7 @@ async function updateRoom () {
         emojis: roomForm.emojis.filter((e) => e.trim()).map((emoji) => ({ emoji })),
         backgroundInput: roomForm.backgroundInput || null,
         backgroundOutput: roomForm.backgroundOutput || null,
+        playful: roomForm.playful,
         tiltLimit: {
           maxReactions: roomForm.tiltMaxReactions,
           cooldownSeconds: roomForm.tiltCooldownSeconds,
