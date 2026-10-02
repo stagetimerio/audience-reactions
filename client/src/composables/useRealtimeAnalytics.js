@@ -3,7 +3,7 @@ import { collection, query, orderBy, limit, onSnapshot, where, Timestamp } from 
 import { db } from '../services/firebase'
 
 const ANALYTICS_TIME_WINDOW_MINUTES = 30 // Easily configurable time window
-const ANALYTICS_BATCH_INTERVAL_SECONDS = 30 // Analytics are created every 30 seconds
+const ANALYTICS_BATCH_INTERVAL_SECONDS = 10
 
 export function useRealtimeAnalytics (roomId) {
   const analytics = ref([])
@@ -13,7 +13,7 @@ export function useRealtimeAnalytics (roomId) {
   let unsubscribe = null
   let updateInterval = null
 
-  // Calculate how many data points we need (30 minutes / 30 seconds = 60 points)
+  // Calculate how many data points we need (30 minutes / 10 seconds = 180 points)
   const maxDataPoints = computed(() => Math.ceil((ANALYTICS_TIME_WINDOW_MINUTES * 60) / ANALYTICS_BATCH_INTERVAL_SECONDS))
 
   // Fetch room data to get emoji configuration
@@ -125,15 +125,15 @@ export function useRealtimeAnalytics (roomId) {
 
     console.log(`[Analytics] Computing chart data with ${analytics.value.length} analytics batches`)
 
-    // Create full timeframe with 30-second intervals
+    // Create full timeframe with batch intervals
     const now = new Date()
     const fullTimeframe = []
     const labels = []
 
     // Generate all expected time slots for the last 30 minutes
-    // Round current time to nearest 30-second boundary for consistent alignment
+    // Round current time to nearest batch boundary for consistent alignment
     const currentSeconds = now.getSeconds()
-    const alignedNow = new Date(now.getTime() - ((currentSeconds % 30) * 1000))
+    const alignedNow = new Date(now.getTime() - ((currentSeconds % ANALYTICS_BATCH_INTERVAL_SECONDS) * 1000))
 
     for (let i = maxDataPoints.value - 1; i >= 0; i--) {
       const slotEndTime = new Date(alignedNow.getTime() - (i * ANALYTICS_BATCH_INTERVAL_SECONDS * 1000))

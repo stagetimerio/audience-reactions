@@ -262,7 +262,7 @@
       <div class="bg-white rounded-lg shadow-sm border p-6">
         <h2 class="text-xl font-semibold text-gray-900 mb-4">Live Analytics (Last 30 Minutes)</h2>
         <p class="text-sm text-gray-600 mb-4">
-          Reactions are processed every minute and grouped into 30-second batches for real-time visualization.
+          Reactions are processed every minute and grouped into 10-second batches for real-time visualization.
         </p>
 
         <!-- Loading state -->

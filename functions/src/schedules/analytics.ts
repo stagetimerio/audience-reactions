@@ -5,19 +5,19 @@ import { db } from '../firebase-setup'
 import { Reaction } from '../types'
 
 /**
- * Rounds a timestamp UP to the next 30-second boundary
- * Examples: 10:04:23 → 10:04:30, 10:04:45 → 10:05:00
+ * Rounds a timestamp UP to the next 10-second boundary
+ * Examples: 10:04:23 → 10:04:30, 10:04:51 → 10:05:00
  */
 function getWindowEndTime(timestamp: Date): Date {
   const ms = timestamp.getTime()
-  const windowSizeMs = 30 * 1000 // 30 seconds in milliseconds
+  const windowSizeMs = 10 * 1000
   const windowEndMs = Math.ceil(ms / windowSizeMs) * windowSizeMs
   return new Date(windowEndMs)
 }
 
 /**
  * Core analytics batching logic
- * Processes ALL unprocessed reactions, grouping into 30-second fixed windows
+ * Processes ALL unprocessed reactions, grouping into 10-second fixed windows
  */
 async function processBatch() {
   try {
@@ -32,7 +32,7 @@ async function processBatch() {
       return
     }
 
-    // Group reactions by roomId and then by 30-second time window
+    // Group reactions by roomId and then by 10-second time window
     const roomWindowGroups: Record<string, Record<string, Partial<Reaction>[]>> = {}
     const reactionsToDelete: DocumentReference[] = []
 
@@ -51,7 +51,7 @@ async function processBatch() {
         continue
       }
 
-      // Calculate the 30-second window this reaction belongs to
+      // Calculate the 10-second window this reaction belongs to
       const windowEndTime = getWindowEndTime(timestamp.toDate())
       const windowKey = windowEndTime.toISOString()
 
@@ -143,7 +143,7 @@ async function processBatch() {
 
 /**
  * Scheduled function that runs every minute
- * Processes all unprocessed reactions into 30-second time windows
+ * Processes all unprocessed reactions into 10-second time windows
  */
 export const batchAnalytics = onSchedule(
   {
