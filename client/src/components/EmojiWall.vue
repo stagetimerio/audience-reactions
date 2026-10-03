@@ -50,11 +50,11 @@ function tilt (id) {
   transition: transform 2s ease-out, opacity 1.2s ease-out 0.8s;
 }
 .emoji-playful-enter-from {
-  transform: translate(-50%, 100vh) rotate(var(--rotate)) scale(0.6);
+  transform: translate(-50%, 100vh) rotate(var(--rotate)) scale(0.5);
   opacity: 100;
 }
 .emoji-playful-enter-to {
-  transform: translate(-50%, 0) rotate(var(--rotate)) scale(1.6);
+  transform: translate(-50%, 0) rotate(var(--rotate)) scale(1);
   opacity: 0;
 }
 .emojifo-enter-from {
