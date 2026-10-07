@@ -2,16 +2,16 @@ import { Request, Response } from 'express'
 import { FieldValue } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
-import { DEFAULT_EMOJIS } from '../types'
 import { roomFromSnapshot } from '../utils/converters'
 import { expiresAt, REACTION_TTL_MS } from '../utils/expiry'
+import { isValidDeviceKey } from '../utils/deviceKey'
 
 /**
  * Submit a reaction to a room
  */
 export async function submitReaction(req: Request<{ roomId: string }>, res: Response): Promise<void> {
   const { roomId } = req.params
-  const { emoji } = req.body
+  const { emoji, deviceId } = req.body
 
   // Validate room ID
   if (!roomId) {
@@ -25,28 +25,12 @@ export async function submitReaction(req: Request<{ roomId: string }>, res: Resp
     return
   }
 
-  // Check if room exists, create if it doesn't
-  const roomRef = db.collection('rooms').doc(roomId)
-  const roomDoc = await roomRef.get()
-
-  let room
+  const roomDoc = await db.collection('rooms').doc(roomId).get()
   if (!roomDoc.exists) {
-    // Create room with default emoji configuration
-    await roomRef.set({
-      name: `Room ${roomId}`,
-      settings: {
-        emojis: DEFAULT_EMOJIS,
-      },
-      expiresAt: null,
-    })
-    logger.info(`Created new room: ${roomId}`)
-
-    // Use default emojis for validation
-    room = { settings: { emojis: DEFAULT_EMOJIS } }
-  } else {
-    // Convert room data for validation
-    room = roomFromSnapshot(roomDoc)
+    res.status(404).json({ error: 'Room not found' })
+    return
   }
+  const room = roomFromSnapshot(roomDoc)
 
   // Validate emoji against room's configured emojis
   const allowedEmojis = room.settings.emojis.map((e) => e.emoji)
@@ -58,21 +42,27 @@ export async function submitReaction(req: Request<{ roomId: string }>, res: Resp
     return
   }
 
-  // Add reaction to subcollection
   const reactionRef = db
     .collection('rooms')
     .doc(roomId)
     .collection('reactions')
     .doc()
 
-  await reactionRef.set({
-    emoji,
-    roomId,
-    timestamp: FieldValue.serverTimestamp(),
-    expiresAt: expiresAt(REACTION_TTL_MS),
-  })
-
-  logger.info(`Reaction added: ${emoji} in room ${roomId}`)
+  // Scripts that do not run our input page get the same response, so they cannot tell they are ignored.
+  if (isValidDeviceKey(deviceId)) {
+    await reactionRef.set({
+      emoji,
+      roomId,
+      deviceId,
+      timestamp: FieldValue.serverTimestamp(),
+      expiresAt: expiresAt(REACTION_TTL_MS),
+    })
+    logger.info(`Reaction added: ${emoji} in room ${roomId}`)
+  } else {
+    logger.warn(`Reaction dropped, no valid device key: ${emoji} in room ${roomId}`, {
+      userAgent: req.get('User-Agent'),
+    })
+  }
 
   res.status(201).json({
     success: true,

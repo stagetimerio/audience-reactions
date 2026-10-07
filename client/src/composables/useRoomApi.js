@@ -1,3 +1,5 @@
+import { getDeviceKey } from '../utils/deviceKey'
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 export function useRoomApi () {
@@ -21,7 +23,7 @@ export function useRoomApi () {
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ emoji }),
+      body: JSON.stringify({ emoji, deviceId: getDeviceKey() }),
     })
 
     if (!response.ok) {

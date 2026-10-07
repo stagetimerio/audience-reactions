@@ -27,6 +27,7 @@ export interface Reaction {
   id: string
   emoji: string
   roomId: string
+  deviceId?: string // Missing on reactions from before 2026-10
   timestamp: Date
   expiresAt: Date
   createdAt: Date
