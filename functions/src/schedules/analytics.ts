@@ -1,5 +1,5 @@
 import { onSchedule } from 'firebase-functions/v2/scheduler'
-import { Timestamp, DocumentReference, FieldValue } from 'firebase-admin/firestore'
+import { Timestamp, FieldValue, QueryDocumentSnapshot } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { Reaction } from '../types'
@@ -16,6 +16,71 @@ function getWindowEndTime(timestamp: Date): Date {
   return new Date(windowEndMs)
 }
 
+// Firestore rejects a large commit with "Transaction too big". A failed commit deletes nothing, so the backlog grows.
+const CHUNK_SIZE = 200
+
+/**
+ * Adds the reactions to their 10-second windows and deletes them in one commit,
+ * so a failed commit never counts a reaction twice.
+ */
+async function commitChunk(reactionDocs: QueryDocumentSnapshot[]): Promise<number> {
+  const roomWindowCounts: Record<string, Record<string, Record<string, number>>> = {}
+  const batch = db.batch()
+
+  for (const reactionDoc of reactionDocs) {
+    const reaction = reactionDoc.data() as Partial<Reaction>
+    const roomId = reaction.roomId
+    const timestamp = reaction.timestamp as Timestamp | undefined
+
+    if (!roomId) {
+      logger.warn(`Reaction ${reactionDoc.id} missing roomId, skipping`)
+      continue
+    }
+
+    if (!timestamp) {
+      logger.warn(`Reaction ${reactionDoc.id} missing timestamp, skipping`)
+      continue
+    }
+
+    const windowKey = getWindowEndTime(timestamp.toDate()).toISOString()
+    roomWindowCounts[roomId] ??= {}
+    roomWindowCounts[roomId][windowKey] ??= {}
+    if (reaction.emoji) {
+      const counts = roomWindowCounts[roomId][windowKey]
+      counts[reaction.emoji] = (counts[reaction.emoji] || 0) + 1
+    }
+    batch.delete(reactionDoc.ref)
+  }
+
+  let windowCount = 0
+  for (const [roomId, windows] of Object.entries(roomWindowCounts)) {
+    batch.set(db.collection('rooms').doc(roomId), { lastUsedAt: FieldValue.serverTimestamp() }, { merge: true })
+
+    for (const [windowKey, counts] of Object.entries(windows)) {
+      const windowEndTime = new Date(windowKey)
+      const analyticsRef = db.collection('rooms').doc(roomId).collection('analytics').doc(windowKey)
+
+      // A window can span two commits. Add to its counts, do not replace them.
+      const increments: Record<string, FieldValue> = {}
+      let total = 0
+      for (const [emoji, count] of Object.entries(counts)) {
+        increments[emoji] = FieldValue.increment(count)
+        total += count
+      }
+      batch.set(analyticsRef, {
+        endTime: Timestamp.fromDate(windowEndTime),
+        counts: increments,
+        total: FieldValue.increment(total),
+        expiresAt: expiresAt(ANALYTICS_TTL_MS, windowEndTime.getTime()),
+      }, { merge: true })
+      windowCount++
+    }
+  }
+
+  await batch.commit()
+  return windowCount
+}
+
 /**
  * Core analytics batching logic
  * Processes ALL unprocessed reactions, grouping into 10-second fixed windows
@@ -25,113 +90,20 @@ async function processBatch() {
     logger.info('Running analytics batching for all unprocessed reactions')
 
     // Get ALL unprocessed reactions across all rooms
-    const reactionsQuery = db.collectionGroup('reactions')
-    const allReactions = await reactionsQuery.get()
+    const allReactions = await db.collectionGroup('reactions').get()
 
     if (allReactions.empty) {
       logger.info('No reactions to process')
       return
     }
 
-    // Group reactions by roomId and then by 10-second time window
-    const roomWindowGroups: Record<string, Record<string, Partial<Reaction>[]>> = {}
-    const reactionsToDelete: DocumentReference[] = []
-
-    for (const reactionDoc of allReactions.docs) {
-      const reaction = reactionDoc.data()
-      const roomId = reaction.roomId as string | undefined
-      const timestamp = reaction.timestamp as Timestamp | undefined
-
-      if (!roomId) {
-        logger.warn(`Reaction ${reactionDoc.id} missing roomId, skipping`)
-        continue
-      }
-
-      if (!timestamp) {
-        logger.warn(`Reaction ${reactionDoc.id} missing timestamp, skipping`)
-        continue
-      }
-
-      // Calculate the 10-second window this reaction belongs to
-      const windowEndTime = getWindowEndTime(timestamp.toDate())
-      const windowKey = windowEndTime.toISOString()
-
-      // Initialize nested structure if needed
-      if (!roomWindowGroups[roomId]) {
-        roomWindowGroups[roomId] = {}
-      }
-      if (!roomWindowGroups[roomId][windowKey]) {
-        roomWindowGroups[roomId][windowKey] = []
-      }
-
-      roomWindowGroups[roomId][windowKey].push(reaction as Partial<Reaction>)
-      reactionsToDelete.push(reactionDoc.ref)
+    let windowCount = 0
+    for (let i = 0; i < allReactions.docs.length; i += CHUNK_SIZE) {
+      windowCount += await commitChunk(allReactions.docs.slice(i, i + CHUNK_SIZE))
     }
-
-    const totalRooms = Object.keys(roomWindowGroups).length
-    let totalWindows = 0
-    for (const windows of Object.values(roomWindowGroups)) {
-      totalWindows += Object.keys(windows).length
-    }
-
-    logger.info(`Processing ${totalRooms} rooms with ${totalWindows} time windows `
-      + `and ${allReactions.size} total reactions`)
-
-    // Create analytics batches for each room/window combination
-    const batch = db.batch()
-
-    for (const [roomId, windows] of Object.entries(roomWindowGroups)) {
-      batch.set(db.collection('rooms').doc(roomId), { lastUsedAt: FieldValue.serverTimestamp() }, { merge: true })
-
-      for (const [windowKey, reactions] of Object.entries(windows)) {
-        try {
-          // Count reactions by emoji type
-          const counts: Record<string, number> = {}
-          let total = 0
-
-          for (const reaction of reactions) {
-            const emoji = reaction.emoji
-            if (emoji) {
-              counts[emoji] = (counts[emoji] || 0) + 1
-              total++
-            }
-          }
-
-          // Create analytics batch document using window end time as ID
-          const windowEndTime = new Date(windowKey)
-          const analyticsRef = db
-            .collection('rooms')
-            .doc(roomId)
-            .collection('analytics')
-            .doc(windowKey)
-
-          // A window can span two runs. Add to its counts, do not replace them.
-          const increments: Record<string, FieldValue> = {}
-          for (const [emoji, count] of Object.entries(counts)) increments[emoji] = FieldValue.increment(count)
-          batch.set(analyticsRef, {
-            endTime: Timestamp.fromDate(windowEndTime),
-            counts: increments,
-            total: FieldValue.increment(total),
-            expiresAt: expiresAt(ANALYTICS_TTL_MS, windowEndTime.getTime()),
-          }, { merge: true })
-
-          logger.info(`Queued analytics for room ${roomId} window ${windowKey}: ${total} reactions`)
-        } catch (error) {
-          logger.error(`Error processing analytics for room ${roomId} window ${windowKey}:`, error)
-        }
-      }
-    }
-
-    // Delete all processed reactions
-    for (const reactionRef of reactionsToDelete) {
-      batch.delete(reactionRef)
-    }
-
-    // Commit all changes in a single batch
-    await batch.commit()
 
     logger.info(`Analytics batching completed: processed ${allReactions.size} reactions `
-      + `from ${totalRooms} rooms into ${totalWindows} time windows`)
+      + `into ${windowCount} window writes`)
   } catch (error) {
     // Check if error is due to missing index
     const err = error as any
@@ -154,6 +126,7 @@ export const batchAnalytics = onSchedule(
     schedule: 'every minute',
     timeZone: 'Europe/Berlin',
     maxInstances: 1,
+    timeoutSeconds: 300,
   },
   async () => {
     await processBatch()
