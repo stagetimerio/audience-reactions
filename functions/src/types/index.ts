@@ -54,6 +54,9 @@ export type RoomFirestore = ReplaceWithTimestamp<Omit<Room, RoomSystemFields>>
 export type ReactionFirestore = ReplaceWithTimestamp<Omit<Reaction, ReactionSystemFields>>
 export type AnalyticsBatchFirestore = ReplaceWithTimestamp<Omit<AnalyticsBatch, AnalyticsBatchSystemFields>>
 
+// The input page uses the same default
+export const DEFAULT_MAX_REACTIONS = 15
+
 // Default room emojis
 export const DEFAULT_EMOJIS = [
   { emoji: '❤️', label: 'Love' },

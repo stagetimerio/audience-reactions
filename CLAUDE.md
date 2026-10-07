@@ -85,7 +85,7 @@ cd functions && npm run build
 - `GET /rooms/{roomId}` - Get room info with emojis and settings
 - `PATCH /rooms/{roomId}?sig={signature}` - Update room settings (requires valid signature)
 - `GET /rooms/{roomId}/validate-signature?sig={signature}` - Validate dashboard signature
-- `POST /rooms/{roomId}/react` - Submit reaction (with 600ms backend rate limiting)
+- `POST /rooms/{roomId}/react` - Submit reaction. Without a valid device key (`client/src/utils/deviceKey.js`) it answers the same and stores nothing. `batchAnalytics` counts each device up to the room's tilt limit per 10-second window
 - `GET /rooms/{roomId}/analytics` - Get analytics data
 
 ### URL Structure
