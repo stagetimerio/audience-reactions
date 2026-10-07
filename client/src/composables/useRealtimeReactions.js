@@ -10,8 +10,11 @@ export function useRealtimeReactions (roomId) {
 
   let unsubscribe = null
   let reactionCounter = 0
-  const maxReactions = 50 // Performance limit
+  const MAX_IN_FLIGHT = 50 // Performance limit
+  const FLIGHT_MS = 2500 // The EmojiWall rise takes 2 s
   const MAX_AGE_MS = 5000
+  const SPREAD_MS = 40 // A burst launches one emoji per 40 ms on average
+  const MAX_SPREAD_MS = 2000
   let newest = null
 
   // Create emoji objects for the EmojiWall component
@@ -27,12 +30,14 @@ export function useRealtimeReactions (roomId) {
     }
   }
 
-  // Remove oldest reactions when limit is exceeded
-  function maintainReactionLimit () {
-    if (reactions.value.length > maxReactions) {
-      const excess = reactions.value.length - maxReactions
-      reactions.value.splice(0, excess)
-    }
+  // A full screen drops new emojis. Removing one in flight makes it vanish mid-air.
+  function launch (reactionDoc) {
+    if (reactions.value.length >= MAX_IN_FLIGHT) return
+    const emote = createReactionEmote(reactionDoc)
+    reactions.value.push(emote)
+    setTimeout(() => {
+      reactions.value = reactions.value.filter((reaction) => reaction.id !== emote.id)
+    }, FLIGHT_MS)
   }
 
   // Start listening to reactions
@@ -60,17 +65,9 @@ export function useRealtimeReactions (roomId) {
           }
           newest = Math.max(newest, ...times)
 
-          added.forEach((change, i) => {
-            if (times[i] < newest - MAX_AGE_MS) return
-
-            // Add random delay (0-120ms) for natural timing
-            const delay = Math.random() * 120
-            setTimeout(() => {
-              const emote = createReactionEmote(change.doc)
-              reactions.value.push(emote)
-              maintainReactionLimit()
-            }, delay)
-          })
+          const fresh = added.filter((_, i) => times[i] >= newest - MAX_AGE_MS)
+          const spread = Math.max(120, Math.min(fresh.length * SPREAD_MS, MAX_SPREAD_MS))
+          fresh.forEach((change) => setTimeout(() => launch(change.doc), Math.random() * spread))
         },
         (err) => {
           console.error('Reactions subscription error:', err)
