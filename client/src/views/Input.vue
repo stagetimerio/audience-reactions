@@ -128,6 +128,7 @@
 <script setup>
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { useSpamProtection } from '../composables/useSpamProtection'
+import { getDeviceKey } from '../utils/deviceKey'
 import { useRoomApi } from '../composables/useRoomApi'
 
 const props = defineProps({
@@ -206,6 +207,7 @@ async function loadRoomData () {
 }
 
 onMounted(async () => {
+  getDeviceKey().catch((err) => console.error('Failed to get a device key:', err))
   // Add classes to prevent zoom and scrolling on mobile
   document.body.classList.add('h-svh', 'overflow-hidden', 'touch-manipulation')
 

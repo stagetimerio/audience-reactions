@@ -16,7 +16,8 @@ router.get('/rooms/:roomId/validate-signature', RoomController.validateSignature
 // Analytics endpoint
 router.get('/rooms/:roomId/analytics', RoomController.getAnalytics)
 
-// Reaction endpoint
+// Reaction endpoints
+router.post('/device-keys', ReactionController.issueDeviceKey)
 router.post('/rooms/:roomId/react', ReactionController.submitReaction)
 
 // Error handling

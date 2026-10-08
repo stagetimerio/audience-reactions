@@ -18,12 +18,13 @@ export function useRoomApi () {
   }
 
   async function submitReaction (roomId, emoji) {
+    const deviceId = await getDeviceKey()
     const response = await fetch(`${API_BASE_URL}/rooms/${roomId}/react`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ emoji, deviceId: getDeviceKey() }),
+      body: JSON.stringify({ emoji, deviceId }),
     })
 
     if (!response.ok) {

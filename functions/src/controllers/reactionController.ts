@@ -1,10 +1,17 @@
 import { Request, Response } from 'express'
-import { FieldValue } from 'firebase-admin/firestore'
+import { FieldValue, Timestamp } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
 import { roomFromSnapshot } from '../utils/converters'
 import { expiresAt, REACTION_TTL_MS } from '../utils/expiry'
-import { isValidDeviceKey } from '../utils/deviceKey'
+import { createDeviceKey, deviceHash, deviceKeyIssuedAt, DEVICE_KEY_NOTICE } from '../utils/deviceKey'
+
+/**
+ * Issue a device key. The input page sends it with each reaction.
+ */
+export function issueDeviceKey(req: Request, res: Response): void {
+  res.status(201).json({ deviceKey: createDeviceKey(), notice: DEVICE_KEY_NOTICE })
+}
 
 /**
  * Submit a reaction to a room
@@ -49,11 +56,14 @@ export async function submitReaction(req: Request<{ roomId: string }>, res: Resp
     .doc()
 
   // Scripts that do not run our input page get the same response, so they cannot tell they are ignored.
-  if (isValidDeviceKey(deviceId)) {
+  const keyIssuedAt = deviceKeyIssuedAt(deviceId)
+  if (keyIssuedAt !== null) {
+    // Reactions are public. Store a hash, so nobody can copy the key of a real device.
     await reactionRef.set({
       emoji,
       roomId,
-      deviceId,
+      deviceHash: deviceHash(deviceId),
+      keyIssuedAt: Timestamp.fromMillis(keyIssuedAt),
       timestamp: FieldValue.serverTimestamp(),
       expiresAt: expiresAt(REACTION_TTL_MS),
     })

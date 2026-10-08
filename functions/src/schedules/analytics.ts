@@ -2,7 +2,7 @@ import { onSchedule } from 'firebase-functions/v2/scheduler'
 import { Timestamp, FieldValue, QueryDocumentSnapshot } from 'firebase-admin/firestore'
 import * as logger from 'firebase-functions/logger'
 import { db } from '../firebase-setup'
-import { DEFAULT_MAX_REACTIONS, Reaction } from '../types'
+import { Reaction } from '../types'
 import { expiresAt, ANALYTICS_TTL_MS } from '../utils/expiry'
 
 /**
@@ -19,38 +19,41 @@ function getWindowEndTime(timestamp: Date): Date {
 // Firestore rejects a large commit with "Transaction too big". A failed commit deletes nothing, so the backlog grows.
 const CHUNK_SIZE = 200
 
-/**
- * The reactions that exceed the room's tilt limit for their device in a 10-second window.
- * A script then scores like one person who taps fast.
- */
-async function findOverLimit(reactionDocs: QueryDocumentSnapshot[]): Promise<Set<string>> {
-  const roomIds = [...new Set(reactionDocs.map((doc) => doc.get('roomId') as string).filter(Boolean))]
-  const rooms = roomIds.length ? await db.getAll(...roomIds.map((id) => db.collection('rooms').doc(id))) : []
-  const limits = new Map(rooms.map((room) => [
-    room.id,
-    room.get('settings.tiltLimit.maxReactions') || DEFAULT_MAX_REACTIONS,
-  ]))
+// A device counts up to 5 reactions per window, so at most 45 in a 90-second pitch.
+const DEVICE_LIMIT_PER_WINDOW = 5
+// A key counts only when it is older than this, so a script that makes a new key for each reaction scores nothing.
+const MIN_KEY_AGE_MS = 45 * 1000
 
-  const overLimit = new Set<string>()
+/**
+ * The reactions that do not count: no device key, a key younger than MIN_KEY_AGE_MS,
+ * or over DEVICE_LIMIT_PER_WINDOW. They still show on the output.
+ */
+function findUncounted(reactionDocs: QueryDocumentSnapshot[]): Set<string> {
+  const uncounted = new Set<string>()
   const counts = new Map<string, number>()
   const byTime = reactionDocs
-    .filter((doc) => doc.get('deviceId') && doc.get('timestamp'))
+    .filter((doc) => doc.get('timestamp'))
     .sort((a, b) => a.get('timestamp').toMillis() - b.get('timestamp').toMillis())
   for (const doc of byTime) {
-    const roomId = doc.get('roomId')
-    const key = `${roomId}|${getWindowEndTime(doc.get('timestamp').toDate()).toISOString()}|${doc.get('deviceId')}`
+    const timestamp: Timestamp = doc.get('timestamp')
+    const keyIssuedAt: Timestamp | undefined = doc.get('keyIssuedAt')
+    if (!keyIssuedAt || !doc.get('deviceHash') || timestamp.toMillis() - keyIssuedAt.toMillis() < MIN_KEY_AGE_MS) {
+      uncounted.add(doc.ref.path)
+      continue
+    }
+    const key = `${doc.get('roomId')}|${getWindowEndTime(timestamp.toDate()).toISOString()}|${doc.get('deviceHash')}`
     const count = (counts.get(key) || 0) + 1
     counts.set(key, count)
-    if (count > (limits.get(roomId) ?? DEFAULT_MAX_REACTIONS)) overLimit.add(doc.ref.path)
+    if (count > DEVICE_LIMIT_PER_WINDOW) uncounted.add(doc.ref.path)
   }
-  return overLimit
+  return uncounted
 }
 
 /**
  * Adds the reactions to their 10-second windows and deletes them in one commit,
  * so a failed commit never counts a reaction twice.
  */
-async function commitChunk(reactionDocs: QueryDocumentSnapshot[], overLimit: Set<string>): Promise<number> {
+async function commitChunk(reactionDocs: QueryDocumentSnapshot[], uncounted: Set<string>): Promise<number> {
   const roomWindowCounts: Record<string, Record<string, Record<string, number>>> = {}
   const batch = db.batch()
 
@@ -72,7 +75,7 @@ async function commitChunk(reactionDocs: QueryDocumentSnapshot[], overLimit: Set
     const windowKey = getWindowEndTime(timestamp.toDate()).toISOString()
     roomWindowCounts[roomId] ??= {}
     roomWindowCounts[roomId][windowKey] ??= {}
-    if (reaction.emoji && !overLimit.has(reactionDoc.ref.path)) {
+    if (reaction.emoji && !uncounted.has(reactionDoc.ref.path)) {
       const counts = roomWindowCounts[roomId][windowKey]
       counts[reaction.emoji] = (counts[reaction.emoji] || 0) + 1
     }
@@ -124,14 +127,14 @@ async function processBatch() {
       return
     }
 
-    const overLimit = await findOverLimit(allReactions.docs)
+    const uncounted = findUncounted(allReactions.docs)
     let windowCount = 0
     for (let i = 0; i < allReactions.docs.length; i += CHUNK_SIZE) {
-      windowCount += await commitChunk(allReactions.docs.slice(i, i + CHUNK_SIZE), overLimit)
+      windowCount += await commitChunk(allReactions.docs.slice(i, i + CHUNK_SIZE), uncounted)
     }
 
     logger.info(`Analytics batching completed: processed ${allReactions.size} reactions `
-      + `into ${windowCount} window writes, ${overLimit.size} over the device limit`)
+      + `into ${windowCount} window writes, ${uncounted.size} not counted`)
   } catch (error) {
     // Check if error is due to missing index
     const err = error as any

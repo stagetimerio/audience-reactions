@@ -27,7 +27,8 @@ export interface Reaction {
   id: string
   emoji: string
   roomId: string
-  deviceId?: string // Missing on reactions from before 2026-10
+  deviceHash?: string // Hash of the key from POST /device-keys. Missing on reactions from before 2026-10
+  keyIssuedAt?: Date
   timestamp: Date
   expiresAt: Date
   createdAt: Date
@@ -53,9 +54,6 @@ type AnalyticsBatchSystemFields = 'id' | 'createdAt' | 'updatedAt'
 export type RoomFirestore = ReplaceWithTimestamp<Omit<Room, RoomSystemFields>>
 export type ReactionFirestore = ReplaceWithTimestamp<Omit<Reaction, ReactionSystemFields>>
 export type AnalyticsBatchFirestore = ReplaceWithTimestamp<Omit<AnalyticsBatch, AnalyticsBatchSystemFields>>
-
-// The input page uses the same default
-export const DEFAULT_MAX_REACTIONS = 15
 
 // Default room emojis
 export const DEFAULT_EMOJIS = [
